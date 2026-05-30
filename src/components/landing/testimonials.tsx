@@ -53,7 +53,7 @@ const itemVariants: Variants = {
 
 export default function Testimonials() {
   return (
-    <section id="testimonials" className="bg-[#020612] py-24 text-white overflow-hidden border-t border-white/5">
+    <section id="testimonials" className="bg-background py-24 text-white overflow-hidden border-t border-white/5">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <motion.span

@@ -57,7 +57,7 @@ const itemVariants: Variants = {
 
 export default function Destinations() {
   return (
-    <section id="destinations" className="bg-[#020612] py-24 text-white overflow-hidden">
+    <section id="destinations" className="bg-background py-24 text-primary overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-10 flex flex-col justify-between gap-5 md:flex-row md:items-end">
           <div>
@@ -86,7 +86,7 @@ export default function Destinations() {
             viewport={{ once: true }}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="inline-flex w-fit items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition-all duration-300 hover:border-violet-500/40 hover:bg-white/10"
+            className="inline-flex w-fit items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-primary transition-all duration-300 hover:border-violet-500/40 hover:bg-white/10"
           >
             View all destinations
             <ArrowRight className="size-4" />
@@ -114,7 +114,7 @@ export default function Destinations() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-6 z-10">
-                <h3 className="text-xl font-bold tracking-tight text-white">{destination.name}</h3>
+                <h3 className="text-xl font-bold tracking-tight text-primary">{destination.name}</h3>
                 <p className="mt-2 text-xs text-zinc-300 leading-normal">{destination.meta}</p>
               </div>
             </motion.article>

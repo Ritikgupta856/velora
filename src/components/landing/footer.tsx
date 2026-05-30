@@ -37,7 +37,7 @@ export default function Footer() {
           <div className="space-y-6">
             <Link href="/" className="flex items-center gap-3 text-foreground">
               <span className="grid size-9 place-items-center rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 shadow-[0_0_28px_rgba(139,92,246,0.3)]">
-                <Plane className="size-5 -rotate-45 fill-white text-white" />
+                <Plane className="size-5 -rotate-45 fill-white text-primary" />
               </span>
               <span className="text-2xl font-black tracking-tight text-foreground">Velora</span>
             </Link>
@@ -81,9 +81,9 @@ export default function Footer() {
               <button
                 type="submit"
                 aria-label="Subscribe"
-                className="grid size-10 shrink-0 place-items-center rounded-lg bg-violet-600 text-white transition hover:bg-violet-500 active:scale-95 cursor-pointer"
+                className="grid size-10 shrink-0 place-items-center rounded-lg bg-violet-600 text-primary transition hover:bg-violet-500 active:scale-95 cursor-pointer"
               >
-                <Send className="size-4 fill-white text-white" />
+                <Send className="size-4 fill-white text-primary" />
               </button>
             </form>
           </div>

@@ -3,10 +3,11 @@
 import React from "react"
 import { ArrowRight } from "lucide-react"
 import { motion } from "framer-motion"
+import Link from "next/link"
 
 export default function CTA() {
   return (
-    <section className="relative overflow-hidden bg-[#020612] py-24 text-white">
+    <section className="relative overflow-hidden bg-background py-24 text-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, scale: 0.98, y: 30 }}
@@ -37,14 +38,16 @@ export default function CTA() {
                   Tell us where you want to go, and let AI handle the rest.
                 </p>
 
-                <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="inline-flex w-fit items-center gap-3 mt-6 rounded-lg bg-white px-7 py-3 text-sm font-black text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur transition hover:bg-zinc-100"
-                >
-                  Generate My Trip
-                  <ArrowRight className="size-4" />
-                </motion.button>
+                <Link href="/generate" className="inline-block mt-6">
+                  <motion.button
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="inline-flex w-fit items-center gap-3 rounded-lg bg-white px-7 py-3 text-sm font-black text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur transition hover:bg-zinc-100 cursor-pointer"
+                  >
+                    Generate My Trip
+                    <ArrowRight className="size-4" />
+                  </motion.button>
+                </Link>
               </div>
             </div>
           </div>

@@ -62,91 +62,122 @@ const cardVariants: Variants = {
 
 export default function Pricing() {
   return (
-    <section id="pricing" className="relative py-24 bg-[#020612] overflow-hidden text-white">
-      {/* Light Radial Gradient Behind Pricing */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-violet-600/5 rounded-full blur-[120px] pointer-events-none" />
+    <section
+      id="pricing"
+      className="relative overflow-hidden bg-white py-24 text-black"
+    >
+      {/* Background Glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(139,92,246,0.12),transparent_55%)]" />
+
+      {/* Grid Background */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#f4f4f5_1px,transparent_1px),linear-gradient(to_bottom,#f4f4f5_1px,transparent_1px)] bg-[size:80px_80px] opacity-40" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
+        {/* Heading */}
+        <div className="mb-16 text-center">
           <motion.span
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-400"
+            className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-600"
           >
             Pricing
           </motion.span>
+
           <motion.h2
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl"
+            className="mt-3 text-4xl font-bold tracking-tight text-black sm:text-5xl"
           >
             Choose the plan that fits you
           </motion.h2>
+
           <motion.p
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="mx-auto mt-4 max-w-2xl text-base text-zinc-400"
+            className="mx-auto mt-4 max-w-2xl text-base text-zinc-600"
           >
             Simple, transparent pricing for every kind of traveler.
           </motion.p>
         </div>
 
+        {/* Pricing Cards */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
-          className="grid gap-8 lg:grid-cols-2 max-w-4xl mx-auto"
+          className="mx-auto grid max-w-4xl gap-8 lg:grid-cols-2"
         >
           {tiers.map((tier) => (
             <motion.div
               key={tier.name}
               variants={cardVariants}
-              whileHover={{ y: -6 }}
-              className={`relative flex flex-col justify-between rounded-3xl border p-6 sm:p-8 backdrop-blur-xl transition-all duration-300 ${
-                tier.popular
-                  ? "border-violet-500 bg-white/[0.04] shadow-[0_20px_50px_rgba(124,58,237,0.12)] z-10"
-                  : "border-white/5 bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.03]"
-              }`}
+              whileHover={{ y: -8 }}
+              className={`relative flex flex-col justify-between rounded-3xl border p-6 sm:p-8 transition-all duration-300 bg-white ${tier.popular
+                  ? "border-violet-500 shadow-2xl shadow-violet-100 z-10"
+                  : "border-zinc-200 hover:border-violet-200 hover:shadow-xl"
+                }`}
             >
+              {/* Popular Badge */}
               {tier.popular && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-1 text-[10px] font-semibold uppercase tracking-wider text-white shadow-md shadow-violet-600/20">
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-1 text-[10px] font-semibold uppercase tracking-wider text-white shadow-lg">
                   Most Popular
                 </div>
               )}
 
               <div>
-                <h3 className="text-xl font-bold text-white">{tier.name}</h3>
-                <p className="mt-2 text-sm text-zinc-400 leading-normal">{tier.description}</p>
-                <div className="mt-6 flex items-baseline gap-1 text-white">
-                  <span className="text-4.5xl font-bold tracking-tight">{tier.price}</span>
-                  <span className="text-sm font-medium text-zinc-400">{tier.period}</span>
+                {/* Plan Name */}
+                <h3 className="text-2xl font-bold text-black">
+                  {tier.name}
+                </h3>
+
+                {/* Description */}
+                <p className="mt-2 text-sm leading-normal text-zinc-600">
+                  {tier.description}
+                </p>
+
+                {/* Price */}
+                <div className="mt-6 flex items-baseline gap-1 text-black">
+                  <span className="text-5xl font-bold tracking-tight">
+                    {tier.price}
+                  </span>
+
+                  <span className="text-sm font-medium text-zinc-500">
+                    {tier.period}
+                  </span>
                 </div>
 
+                {/* Features */}
                 <ul className="mt-8 space-y-4">
                   {tier.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-3">
-                      <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-violet-500/10 text-violet-400">
+                    <li
+                      key={feature}
+                      className="flex items-start gap-3"
+                    >
+                      <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-600">
                         <Check className="size-3" />
                       </div>
-                      <span className="text-sm text-zinc-300">{feature}</span>
+
+                      <span className="text-sm text-zinc-700">
+                        {feature}
+                      </span>
                     </li>
                   ))}
                 </ul>
               </div>
 
+              {/* Button */}
               <div className="mt-8">
                 <Button
-                  className={`w-full py-6 rounded-xl font-semibold transition-all duration-300 ${
-                    tier.popular
-                      ? "bg-violet-600 hover:bg-violet-500 text-white shadow-lg shadow-violet-600/15"
-                      : "bg-white/[0.04] border border-white/10 hover:bg-white/[0.08] text-white hover:text-white"
-                  }`}
+                  className={`w-full rounded-xl py-6 font-semibold transition-all duration-300 ${tier.popular
+                      ? "bg-violet-600 text-white shadow-lg shadow-violet-200 hover:bg-violet-500"
+                      : "border border-zinc-200 bg-zinc-100 text-black hover:bg-zinc-200"
+                    }`}
                 >
                   {tier.buttonText}
                 </Button>
@@ -155,23 +186,26 @@ export default function Pricing() {
           ))}
         </motion.div>
 
+        {/* Bottom Features */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.3 }}
-          className="mt-12 flex flex-wrap justify-center items-center gap-6 text-xs text-zinc-500"
+          className="mt-12 flex flex-wrap items-center justify-center gap-6 text-xs text-zinc-600"
         >
           <div className="flex items-center gap-2">
-            <Check className="size-4 text-violet-400" />
+            <Check className="size-4 text-violet-500" />
             7-day free trial
           </div>
+
           <div className="flex items-center gap-2">
-            <Check className="size-4 text-violet-400" />
+            <Check className="size-4 text-violet-500" />
             Cancel anytime
           </div>
+
           <div className="flex items-center gap-2">
-            <Check className="size-4 text-violet-400" />
+            <Check className="size-4 text-violet-500" />
             No hidden charges
           </div>
         </motion.div>

@@ -1,12 +1,13 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import Image from "next/image"
-import { ArrowRight, Plane, Sparkles } from "lucide-react"
+import { Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { motion, Variants } from "framer-motion"
+import GenerateForm, { GenerateFormData } from "@/components/generate/GenerateForm"
+import { useRouter } from "next/navigation"
 
 const travelers = [
   "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&q=80",
@@ -46,24 +47,13 @@ const itemVariants: Variants = {
   },
 }
 
-const cardVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.96, y: 30 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    y: 0,
-    transition: {
-      type: "spring",
-      stiffness: 60,
-      damping: 16,
-      delay: 0.3,
-    },
-  },
-}
-
 export default function Hero() {
+  const router = useRouter()
   const [currentPromptIndex, setCurrentPromptIndex] = useState(0)
   const [placeholderText, setPlaceholderText] = useState("")
+  const [showForm, setShowForm] = useState(false)
+  const [pendingForm, setPendingForm] = useState<GenerateFormData | null>(null)
+  const [showConfirm, setShowConfirm] = useState(false)
 
   useEffect(() => {
     let charIndex = 0
@@ -104,22 +94,50 @@ export default function Hero() {
     return () => clearTimeout(timer)
   }, [currentPromptIndex])
 
+  const handleGenerateRequest = (data: GenerateFormData) => {
+    setPendingForm(data)
+    setShowConfirm(true)
+  }
+
+  const confirmGenerate = () => {
+    if (!pendingForm) return
+    setShowConfirm(false)
+    setShowForm(false)
+
+    const id = typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID()
+      : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
+
+    try {
+      window.sessionStorage.setItem(
+        `velora-trip:${id}`,
+        JSON.stringify({
+          request: pendingForm,
+          createdAt: Date.now(),
+        })
+      )
+    } catch (error) {
+      console.error("Failed to persist trip request", error)
+    }
+
+    router.push(`/trip/${id}?processing=1`)
+  }
+
   return (
     <section
       id="hero"
-      className="relative overflow-hidden px-4 pt-32 pb-20 sm:px-6 lg:px-8 lg:pt-40 lg:pb-28"
+      className="relative overflow-hidden px-4 pt-36 pb-20 sm:px-6 lg:px-8 lg:pt-44 lg:pb-28"
       style={{
-        backgroundImage: "url('/images/hero-bg.png')",
-        backgroundSize: "cover",
+        backgroundImage: "url('/images/image.png')",
         backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "cover",
       }}
     >
-      <div className="absolute inset-0 bg-black/30" />
 
-      {/* Subtle top glow overlay */}
-      <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80" aria-hidden="true">
-        <div className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-violet-500 to-fuchsia-500 opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72rem]" />
-      </div>
+
+
+      <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-white/55 to-white/90" />
 
       <div className="relative z-10 mx-auto max-w-7xl">
         <motion.div
@@ -130,8 +148,8 @@ export default function Hero() {
         >
           {/* Badge */}
           <motion.div variants={itemVariants} className="mb-6 flex justify-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-violet-300 backdrop-blur-sm">
-              <Sparkles className="size-3.5 text-violet-400 animate-pulse" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-white/80 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-teal-700 shadow-sm backdrop-blur-sm">
+              <Sparkles className="size-3.5 text-teal-500" />
               AI Powered Travel Planner
             </div>
           </motion.div>
@@ -139,12 +157,12 @@ export default function Hero() {
           {/* Heading */}
           <motion.h1
             variants={itemVariants}
-            className="text-4xl font-bold leading-[1.1] tracking-[-0.04em] text-white sm:text-6xl md:text-7xl"
+            className="text-4xl font-bold leading-[1.1] tracking-[-0.04em] text-primary sm:text-6xl md:text-7xl"
           >
             Plan unforgettable
             <br />
             journeys{" "}
-            <span className="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-fuchsia-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-teal-600 via-sky-600 to-rose-500 bg-clip-text text-transparent">
               with AI
             </span>
           </motion.h1>
@@ -152,7 +170,7 @@ export default function Hero() {
           {/* Subheading */}
           <motion.p
             variants={itemVariants}
-            className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-zinc-400 sm:text-lg sm:leading-8"
+            className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-gray-600 sm:text-lg sm:leading-8"
           >
             AI-powered itineraries, budgets, and hidden gems for your next adventure.
           </motion.p>
@@ -160,17 +178,17 @@ export default function Hero() {
           {/* Input with typing placeholder */}
           <motion.div
             variants={itemVariants}
-            className="mx-auto mt-10 flex h-16 max-w-2xl items-center overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_0_50px_-12px_rgba(139,92,246,0.3)] transition-all duration-300 hover:border-violet-500/30 focus-within:border-violet-500/50 focus-within:shadow-[0_0_50px_-8px_rgba(139,92,246,0.4)]"
+            className="mx-auto mt-10 flex h-16 max-w-2xl items-center overflow-hidden rounded-2xl border border-gray-200 bg-white/90 backdrop-blur-xl shadow-[0_20px_60px_-30px_rgba(15,23,42,0.45)] transition-all duration-300 hover:border-teal-300 focus-within:border-teal-400"
           >
             <Input
               type="text"
               placeholder={placeholderText}
-              className="h-full flex-1 border-0 bg-transparent px-5 text-sm text-white shadow-none outline-none ring-0 placeholder:text-zinc-500 focus-visible:ring-0 sm:text-base"
+              className="h-full flex-1 border-0 bg-transparent px-5 text-sm text-gray-900 shadow-none outline-none ring-0 placeholder:text-gray-500 focus-visible:ring-0 sm:text-base"
             />
 
-            <Button className="h-full rounded-l-none rounded-r-2xl bg-violet-600 px-6 text-sm font-semibold text-white transition-all duration-300 hover:bg-violet-500 active:scale-[0.98] sm:px-8 border-l border-white/10 shadow-none">
+            <button onClick={() => setShowForm(true)} className="h-full rounded-l-none rounded-r-2xl bg-gray-900 px-6 text-sm font-semibold text-white transition-all duration-300 hover:bg-gray-800 active:scale-[0.98] sm:px-8 border-l border-gray-200 shadow-none cursor-pointer">
               Generate Trip
-            </Button>
+            </button>
           </motion.div>
 
           {/* Social Proof */}
@@ -187,90 +205,41 @@ export default function Hero() {
               ))}
             </div>
 
-            <p className="text-sm text-zinc-400">
-              <span className="font-semibold text-white">10,000+</span> travelers exploring smarter
+            <p className="text-sm text-gray-600">
+              <span className="font-semibold text-gray-900">10,000+</span> travelers exploring smarter
             </p>
           </motion.div>
         </motion.div>
 
-        {/* Hero Card Mockup with responsive adjustments and Framer Motion */}
-        <motion.div
-          variants={cardVariants}
-          initial="hidden"
-          animate="visible"
-          className="relative mx-auto mt-16 max-w-5xl overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-4 backdrop-blur-2xl transition duration-500 hover:border-white/15 md:p-6 shadow-[0_30px_100px_rgba(0,0,0,0.8)]"
-        >
-          <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
-            {/* Left Info */}
-            <div className="flex flex-col justify-between rounded-2xl border border-white/10 bg-black/40 p-6">
-              <div>
-                <h3 className="text-2xl font-bold text-white">
-                  Goa Getaway 🌴
-                </h3>
-                <p className="mt-1 text-sm text-zinc-400">
-                  4 Days • 3 Nights
-                </p>
+    
+      </div>
+      {/* Form Modal */}
+      {showForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div onClick={() => setShowForm(false)} className="absolute inset-0 bg-black/40" />
+          <div className="relative z-10 w-full max-w-lg p-4">
+            <GenerateForm onConfirmRequest={handleGenerateRequest} />
+          </div>
+        </div>
+      )}
 
-                <div className="mt-8 space-y-5">
-                  <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                    <p className="text-sm text-zinc-500">Budget</p>
-                    <h4 className="text-lg font-semibold text-white">₹24,800</h4>
-                  </div>
-
-                  <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                    <p className="text-sm text-zinc-500">Best Time</p>
-                    <h4 className="text-sm font-medium text-white">Nov — Feb</h4>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm text-zinc-500">Rating</p>
-                    <h4 className="text-sm font-medium text-white">⭐ 4.8</h4>
-                  </div>
-                </div>
-              </div>
-
-              <Button className="mt-8 w-full rounded-xl bg-white/10 border border-white/10 py-3.5 text-sm font-semibold text-white transition hover:bg-white/20 active:scale-[0.98]">
-                View itinerary
-              </Button>
-            </div>
-
-            {/* Right Preview - Explicit height on mobile to prevent collapse */}
-            <div className="relative h-[250px] sm:h-[350px] lg:h-auto overflow-hidden rounded-2xl border border-white/10 group">
-              <Image
-                src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e"
-                alt="Goa"
-                fill
-                className="object-cover transition duration-700 group-hover:scale-[1.03]"
-                priority
-              />
-
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
-
-              {/* Floating Cards (Responsive) */}
-              <div className="absolute bottom-4 left-4 right-4 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3 md:bottom-6 md:left-6 md:right-6">
-                {[
-                  { day: "Day 1", spot: "Baga Beach" },
-                  { day: "Day 2", spot: "Anjuna Beach" },
-                  { day: "Day 3", spot: "Dudhsagar Falls" },
-                  { day: "Day 4", spot: "Old Goa" },
-                ].map((item) => (
-                  <div
-                    key={item.day}
-                    className="rounded-xl border border-white/10 bg-black/50 p-2.5 backdrop-blur-md transition hover:border-violet-500/30"
-                  >
-                    <p className="text-[10px] text-zinc-400 font-semibold uppercase tracking-wider">{item.day}</p>
-                    <h5 className="mt-1 text-xs font-semibold text-white truncate">
-                      {item.spot}
-                    </h5>
-                  </div>
-                ))}
-              </div>
+      {/* Confirmation Modal */}
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div onClick={() => setShowConfirm(false)} className="absolute inset-0 bg-black/40" />
+          <div className="relative bg-white border border-gray-200 rounded-2xl p-5 z-10 w-full max-w-sm">
+            <h3 className="text-lg font-bold text-gray-900">Please confirm</h3>
+            <p className="text-sm text-gray-600 mt-2">Bro — check your choices before we build the itinerary. Proceed?</p>
+            <div className="flex gap-3 mt-4">
+              <Button onClick={() => setShowConfirm(false)} className="flex-1 border border-gray-200 bg-white text-gray-700">Cancel</Button>
+              <Button onClick={confirmGenerate} className="flex-1 bg-gray-900 text-white hover:bg-gray-800">Yes, build itinerary</Button>
             </div>
           </div>
-        </motion.div>
-      </div>
+        </div>
+      )}
+
+      {/* AI Processing Overlay */}
+      {/* Processing moved to trip page; hero no longer shows loading */}
     </section>
   )
 }
-
-

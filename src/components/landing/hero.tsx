@@ -6,7 +6,7 @@ import { ArrowRight, Plane, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { motion } from "framer-motion"
+import { motion, Variants } from "framer-motion"
 
 const travelers = [
   "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&q=80",
@@ -23,7 +23,7 @@ const prompts = [
   "Romantic 4-day Udaipur getaway",
 ]
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -33,7 +33,7 @@ const containerVariants = {
   },
 }
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
@@ -46,7 +46,7 @@ const itemVariants = {
   },
 }
 
-const cardVariants = {
+const cardVariants: Variants = {
   hidden: { opacity: 0, scale: 0.96, y: 30 },
   visible: {
     opacity: 1,

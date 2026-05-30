@@ -2,7 +2,7 @@
 
 import React from "react"
 import { Heart, MapPin, Sparkles, WalletCards } from "lucide-react"
-import { motion } from "framer-motion"
+import { motion, Variants } from "framer-motion"
 
 const features = [
   {
@@ -27,7 +27,7 @@ const features = [
   },
 ]
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -37,7 +37,7 @@ const containerVariants = {
   },
 }
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 25 },
   visible: {
     opacity: 1,

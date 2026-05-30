@@ -3,7 +3,7 @@
 import React from "react"
 import { Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { motion } from "framer-motion"
+import { motion, Variants } from "framer-motion"
 
 const tiers = [
   {
@@ -37,7 +37,7 @@ const tiers = [
   },
 ]
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -47,7 +47,7 @@ const containerVariants = {
   },
 }
 
-const cardVariants = {
+const cardVariants: Variants = {
   hidden: { opacity: 0, y: 30 },
   visible: {
     opacity: 1,

@@ -1,126 +1,118 @@
 "use client"
+
 import Link from "next/link"
-import React, { useState, useEffect } from "react"
-import { Plane, Menu, X } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
+import { useEffect, useState } from "react"
+import { Menu, Navigation, X } from "lucide-react"
+import { AnimatePresence, motion } from "framer-motion"
+
+const navItems = [
+  { label: "Features", href: "#features" },
+  { label: "Destinations", href: "#destinations" },
+  { label: "How it works", href: "#how" },
+  { label: "Pricing", href: "#pricing" },
+  { label: "Blog", href: "#" },
+]
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true)
-      } else {
-        setIsScrolled(false)
-      }
-    }
-
+    const handleScroll = () => setIsScrolled(window.scrollY > 12)
+    handleScroll()
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
   return (
     <header
-      className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${isScrolled
-        ? "bg-white/95 border-b border-gray-100 py-4 backdrop-blur-xl shadow-sm"
-        : "bg-transparent py-4"
-        }`}
+      className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${
+        isScrolled
+          ? "border-b border-[var(--velora-line)]/80 bg-[var(--velora-shell)]/88 py-3 shadow-[0_14px_50px_rgb(48_28_112_/_8%)] backdrop-blur-2xl"
+          : "bg-transparent py-5"
+      }`}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="velora-container flex items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-3">
-          <span className="grid size-9 place-items-center rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 ">
-            <Plane className="size-5 -rotate-45 fill-white" />
+          <span className="grid size-8 place-items-center rounded-full bg-[var(--velora-primary)] shadow-[0_14px_32px_rgb(109_53_255_/_28%)]">
+            <Navigation className="size-4 -rotate-45 fill-white text-white" />
           </span>
-          <span className="text-2xl font-black tracking-tight text-gray-900">Velora</span>
+          <span className="text-2xl font-black tracking-[-0.04em] text-[var(--velora-ink)]">Velora</span>
         </Link>
 
-        {/* Desktop Navigation */}
-        <nav>
-          <ul className="hidden items-center gap-10 text-sm font-semibold text-gray-600 lg:flex">
-            <li><Link className="transition hover:text-gray-900" href="#features">Features</Link></li>
-            <li><Link className="transition hover:text-gray-900" href="#destinations">Destinations</Link></li>
-            <li><Link className="transition hover:text-gray-900" href="#how">How it works</Link></li>
-            <li><Link className="transition hover:text-gray-900" href="#pricing">Pricing</Link></li>
+        <nav className="hidden lg:block" aria-label="Primary navigation">
+          <ul className="flex items-center gap-11 text-sm font-bold text-[var(--velora-ink-soft)]">
+            {navItems.map((item) => (
+              <li key={item.label}>
+                <Link className="transition hover:text-[var(--velora-primary)]" href={item.href}>
+                  {item.label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </nav>
 
-        {/* Action Buttons & Hamburger */}
-        <div className="flex items-center gap-6">
-          <Link href="#hero" className="hidden text-sm font-semibold text-gray-600 transition hover:text-gray-900 md:inline-flex">
-            Login
+        <div className="flex items-center gap-3">
+          <Link
+            href="#hero"
+            className="hidden rounded-2xl bg-white/60 px-5 py-3 text-sm font-black text-[var(--velora-primary-deep)] shadow-sm ring-1 ring-white/80 backdrop-blur-xl transition hover:bg-white md:inline-flex"
+          >
+            Log in
           </Link>
-          <Link href="#" className="hidden rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-primary transition hover:bg-violet-500 md:inline-flex">Sign up</Link>
+          <Link
+            href="#hero"
+            className="hidden rounded-2xl bg-[var(--velora-primary)] px-6 py-3 text-sm font-black text-white shadow-[0_16px_36px_rgb(109_53_255_/_28%)] transition hover:bg-[var(--velora-primary-deep)] md:inline-flex"
+          >
+            Sign up
+          </Link>
 
-          {/* Hamburger button for mobile */}
           <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="flex size-9 items-center justify-center rounded-lg bg-gray-100 text-gray-600 transition hover:bg-gray-200 hover:text-gray-900 lg:hidden"
-            aria-label="Toggle Menu"
+            onClick={() => setIsMobileMenuOpen((open) => !open)}
+            className="grid size-11 place-items-center rounded-2xl bg-white/80 text-[var(--velora-ink)] shadow-sm ring-1 ring-[var(--velora-line)] lg:hidden"
+            aria-label="Toggle menu"
+            type="button"
           >
             {isMobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Drawer */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="border-b border-gray-100 bg-white backdrop-blur-2xl lg:hidden"
+            className="border-t border-[var(--velora-line)]/70 bg-[var(--velora-shell)]/96 backdrop-blur-2xl lg:hidden"
           >
-            <div className="px-4 py-6 sm:px-6">
-              <nav className="flex flex-col gap-4">
+            <nav className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-5 sm:px-6">
+              {navItems.map((item) => (
+                <Link
+                  key={item.label}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="rounded-2xl px-4 py-3 text-base font-bold text-[var(--velora-ink-soft)] transition hover:bg-white hover:text-[var(--velora-primary)]"
+                  href={item.href}
+                >
+                  {item.label}
+                </Link>
+              ))}
+              <div className="mt-3 grid grid-cols-2 gap-3">
                 <Link
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-base font-semibold text-gray-700 transition hover:text-gray-900 py-2 border-b border-gray-100"
-                  href="#features"
+                  href="#hero"
+                  className="rounded-2xl bg-white px-4 py-3 text-center text-sm font-black text-[var(--velora-primary-deep)]"
                 >
-                  Features
+                  Log in
                 </Link>
                 <Link
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-base font-semibold text-gray-700 transition hover:text-gray-900 py-2 border-b border-gray-100"
-                  href="#destinations"
+                  href="#hero"
+                  className="rounded-2xl bg-[var(--velora-primary)] px-4 py-3 text-center text-sm font-black text-white"
                 >
-                  Destinations
+                  Sign up
                 </Link>
-                <Link
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-base font-semibold text-gray-700 transition hover:text-gray-900 py-2 border-b border-gray-100"
-                  href="#how"
-                >
-                  How it works
-                </Link>
-                <Link
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-base font-semibold text-gray-700 transition hover:text-gray-900 py-2 border-b border-gray-100"
-                  href="#pricing"
-                >
-                  Pricing
-                </Link>
-                <div className="mt-4 flex flex-col gap-3">
-                  <Link
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    href="#hero"
-                    className="w-full text-center py-3 text-sm font-semibold text-gray-700 border border-gray-200 rounded-xl transition hover:bg-gray-50"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    href="#"
-                    className="w-full text-center py-3 text-sm font-semibold text-primary bg-violet-600 rounded-xl transition hover:bg-violet-500"
-                  >
-                    Sign up
-                  </Link>
-                </div>
-              </nav>
-            </div>
+              </div>
+            </nav>
           </motion.div>
         )}
       </AnimatePresence>

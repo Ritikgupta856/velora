@@ -1,30 +1,29 @@
 "use client"
 
-import React from "react"
-import { MessageSquare, Sparkles, Sliders, Briefcase } from "lucide-react"
+import { Briefcase, MessageSquare, Sliders, Sparkles } from "lucide-react"
 import { motion, Variants } from "framer-motion"
 
 const steps = [
   {
-    number: "1",
+    number: "01",
     title: "Tell us your plan",
     description: "Share your destination, dates, budget, and preferences.",
     icon: MessageSquare,
   },
   {
-    number: "2",
+    number: "02",
     title: "AI builds your trip",
     description: "Our AI crafts the perfect itinerary, budget, and routes.",
     icon: Sparkles,
   },
   {
-    number: "3",
+    number: "03",
     title: "Review & customize",
     description: "Tweak your plan, adjust stops, and make it yours.",
     icon: Sliders,
   },
   {
-    number: "4",
+    number: "04",
     title: "Pack & go",
     description: "Save, share, and sync your trip. Adventure awaits!",
     icon: Briefcase,
@@ -35,9 +34,7 @@ const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
+    transition: { staggerChildren: 0.1 },
   },
 }
 
@@ -46,34 +43,31 @@ const itemVariants: Variants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: {
-      type: "spring",
-      stiffness: 80,
-      damping: 14,
-    },
+    transition: { type: "spring", stiffness: 80, damping: 14 },
   },
 }
 
 export default function HowItWorks() {
   return (
-    <section id="how" className="relative py-24 bg-gray-50 overflow-hidden">
+    <section id="how" className="velora-section bg-[var(--velora-shell)] pt-28 lg:pt-40">
+      <div className="absolute left-1/2 top-0 h-72 w-[44rem] -translate-x-1/2 rounded-full bg-[var(--velora-primary-soft)] blur-3xl" />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <motion.span
+      <div className="velora-container relative z-10">
+        <div className="mb-14 text-center">
+          <motion.p
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-600"
+            className="velora-eyebrow"
           >
             How it works
-          </motion.span>
+          </motion.p>
           <motion.h2
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="mt-3 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl md:text-5xl"
+            className="mt-3 text-3xl font-black tracking-[-0.05em] text-[var(--velora-ink)] sm:text-5xl"
           >
             Plan your trip in 4 simple steps
           </motion.h2>
@@ -84,37 +78,29 @@ export default function HowItWorks() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
-          className="grid gap-6 md:grid-cols-2 lg:grid-cols-4"
+          className="grid gap-7 md:grid-cols-2 lg:grid-cols-4"
         >
-          {steps.map((step) => {
+          {steps.map((step, index) => {
             const Icon = step.icon
             return (
-              <motion.div
+              <motion.article
                 key={step.number}
                 variants={itemVariants}
-                whileHover={{ y: -6, transition: { duration: 0.2 } }}
-                className="group relative rounded-3xl border border-gray-100 bg-white p-8 transition-all duration-300 hover:border-violet-200 hover:shadow-lg shadow-sm"
+                whileHover={{ y: -7, transition: { duration: 0.2 } }}
+                className="velora-card group relative rounded-[1.75rem] p-8 text-center"
               >
-                {/* Step indicator */}
-                <div className="absolute top-6 left-6 text-xs font-bold text-violet-400 tracking-wider">
-                  STEP {step.number.padStart(2, '0')}
+                {index < steps.length - 1 && (
+                  <div className="pointer-events-none absolute -right-8 top-1/2 hidden h-px w-9 border-t border-dashed border-[var(--velora-primary)]/50 lg:block" />
+                )}
+                <p className="absolute left-6 top-6 text-[11px] font-black uppercase tracking-[0.16em] text-[var(--velora-primary)]">
+                  Step {step.number}
+                </p>
+                <div className="mx-auto mt-8 grid size-16 place-items-center rounded-full bg-[var(--velora-primary-soft)] text-[var(--velora-primary)] transition group-hover:scale-105">
+                  <Icon className="size-7" />
                 </div>
-
-                <div className="mt-4 flex justify-center">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-50 text-violet-500 group-hover:bg-violet-100 group-hover:scale-105 transition-all duration-300 shadow-[0_8px_30px_rgba(124,58,237,0.08)] group-hover:shadow-[0_8px_30px_rgba(124,58,237,0.15)]">
-                    <Icon className="size-6 text-violet-500 transition-transform duration-300" />
-                  </div>
-                </div>
-
-                <div className="mt-6 text-center">
-                  <h3 className="text-lg font-semibold text-gray-900 transition-colors">
-                    {step.title}
-                  </h3>
-                  <p className="mt-3 text-sm text-gray-500 leading-relaxed transition-colors duration-300 group-hover:text-gray-600">
-                    {step.description}
-                  </p>
-                </div>
-              </motion.div>
+                <h3 className="mt-7 text-lg font-black text-[var(--velora-ink)]">{step.title}</h3>
+                <p className="mt-3 text-sm font-medium leading-6 text-[var(--velora-muted)]">{step.description}</p>
+              </motion.article>
             )
           })}
         </motion.div>

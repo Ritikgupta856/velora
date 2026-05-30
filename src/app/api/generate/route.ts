@@ -30,8 +30,20 @@ export async function POST(req: NextRequest) {
       model: MODEL,
       contents: prompt,
       config: {
-        systemInstruction:
-          "You are an elite travel planner. Return valid JSON only. Build rich, realistic itineraries with concise day titles, useful pacing, and practical budgets. Never wrap the response in markdown.",
+        systemInstruction: `You are an elite travel planner. Return valid JSON only.
+Build rich, realistic itineraries with concise day titles, useful pacing, and practical budgets.
+For the "img" field, you MUST use the Unsplash Source API with 2-3 relevant keywords describing the activity.
+Format it STRICTLY as: https://source.unsplash.com/600x400/?keyword1,keyword2
+Examples:
+  - Beach activity   → https://source.unsplash.com/600x400/?beach,ocean,tropical
+  - Museum/culture   → https://source.unsplash.com/600x400/?museum,art,gallery
+  - Food/restaurant  → https://source.unsplash.com/600x400/?food,restaurant,dining
+  - Nightlife/club   → https://source.unsplash.com/600x400/?nightclub,nightlife,city
+  - Hiking/nature    → https://source.unsplash.com/600x400/?hiking,mountain,nature
+  - Market/shopping  → https://source.unsplash.com/600x400/?market,shopping,bazaar
+  - Hotel/check-in   → https://source.unsplash.com/600x400/?hotel,lobby,travel
+  - Airport/travel   → https://source.unsplash.com/600x400/?airport,travel,departure
+NEVER use https://images.unsplash.com/photo-[id] format — those URLs break with 404 errors.`,
         temperature: 0.3,
         responseMimeType: "application/json",
         responseSchema: {
@@ -54,11 +66,19 @@ export async function POST(req: NextRequest) {
                         time: { type: Type.STRING },
                         title: { type: Type.STRING },
                         tag: { type: Type.STRING },
+                        tagColor: {
+                          type: Type.STRING,
+                          description: "MUST be exactly one of these strings: 'violet', 'teal', 'green', or 'amber'"
+                        },
                         desc: { type: Type.STRING },
                         duration: { type: Type.STRING },
                         cost: { type: Type.STRING },
+                        img: {
+                          type: Type.STRING,
+                          description: "MUST use format: https://source.unsplash.com/600x400/?keyword1,keyword2"
+                        }
                       },
-                      required: ["time", "title", "tag", "desc", "duration", "cost"]
+                      required: ["time", "title", "tag", "tagColor", "desc", "duration", "cost", "img"]
                     }
                   }
                 },
@@ -94,11 +114,12 @@ export async function POST(req: NextRequest) {
           let fullText = ""
           let chunkCount = 0
 
+          // Phase 1: Sent immediately when the stream initial connection opens
           push(controller, "status", {
             phase: "analyzing",
-            progress: 14,
+            progress: 15,
             title: "Reading your brief",
-            message: `Locking onto ${parsedInput.destination} and the preferences you shared.`,
+            message: `Locking onto ${parsedInput.destination} and processing preferences.`,
           })
 
           for await (const chunk of responseStream) {
@@ -107,37 +128,37 @@ export async function POST(req: NextRequest) {
               fullText += text
               chunkCount += 1
 
-              if (chunkCount === 1) {
+              // Phase 2 & 3: Distributed naturally across string segment length thresholds
+              if (chunkCount === 3) {
                 push(controller, "status", {
                   phase: "routing",
-                  progress: 34,
+                  progress: 45,
                   title: "Building the route",
-                  message: "Sequencing days, anchors, and pacing.",
+                  message: "Sequencing location loops, anchors, and daily pacing.",
                 })
-              } else if (chunkCount === 4) {
+              } else if (chunkCount === 12) {
                 push(controller, "status", {
                   phase: "balancing",
-                  progress: 62,
+                  progress: 75,
                   title: "Balancing the budget",
-                  message: "Fine-tuning cost and activity flow.",
+                  message: "Calculating localized pricing tiers and adjustments.",
                 })
               }
 
-              push(controller, "delta", {
-                text,
-              })
+              // Stream the real token chunk data characters immediately down the pipe
+              push(controller, "delta", { text })
             }
           }
 
+          // Phase 4: Final validation confirmation
           push(controller, "status", {
             phase: "finalizing",
-            progress: 90,
+            progress: 95,
             title: "Polishing itinerary",
-            message: "Checking structure, costs, and day-by-day flow.",
+            message: "Verifying formatting layouts, image queries, and costs.",
           })
 
           const parsed = JSON.parse(fullText.trim())
-
           push(controller, "done", parsed)
           controller.close()
         } catch (error) {
@@ -154,7 +175,7 @@ export async function POST(req: NextRequest) {
         "Content-Type": "text/event-stream; charset=utf-8",
         "Cache-Control": "no-cache, no-transform",
         Connection: "keep-alive",
-        "X-Accel-Buffering": "no",
+        "X-Accel-Buffering": "no", // Disables Vercel/Nginx route buffering proxies
       },
     })
 

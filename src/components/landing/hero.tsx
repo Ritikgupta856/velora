@@ -1,12 +1,11 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
-import { Sparkles } from "lucide-react"
+import { useEffect, useState } from "react"
+import { ArrowRight, CalendarDays, MapPin, Sparkles, Star } from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { motion, Variants } from "framer-motion"
 import GenerateForm, { GenerateFormData } from "@/components/generate/GenerateForm"
+import { motion, Variants } from "framer-motion"
 import { useRouter } from "next/navigation"
 
 const travelers = [
@@ -19,31 +18,32 @@ const travelers = [
 
 const prompts = [
   "Plan a 4-day Goa trip under ₹25k",
-  "3-day winter getaway to Manali",
-  "Budget 5-day Bali itinerary",
-  "Romantic 4-day Udaipur getaway",
+  "Build a Bali honeymoon in 5 days",
+  "Find hidden cafes in Jaipur",
+  "Plan a Swiss train adventure",
+]
+
+const dayCards = [
+  ["Day 1", "North Goa Vibes"],
+  ["Day 2", "Island Adventure"],
+  ["Day 3", "Culture & Cafes"],
+  ["Day 4", "Beach & Relax"],
 ]
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.12,
-    },
+    transition: { staggerChildren: 0.12 },
   },
 }
 
 const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 22 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: {
-      type: "spring",
-      stiffness: 90,
-      damping: 14,
-    },
+    transition: { type: "spring", stiffness: 92, damping: 15 },
   },
 }
 
@@ -57,33 +57,25 @@ export default function Hero() {
 
   useEffect(() => {
     let charIndex = 0
-    let currentPrompt = prompts[currentPromptIndex]
     let isDeleting = false
     let typingSpeed = 60
     let timer: NodeJS.Timeout
 
     const type = () => {
-      currentPrompt = prompts[currentPromptIndex]
+      const currentPrompt = prompts[currentPromptIndex]
+
       if (!isDeleting) {
         setPlaceholderText(currentPrompt.substring(0, charIndex + 1))
-        charIndex++
-
-        if (charIndex === currentPrompt.length) {
-          isDeleting = true
-          typingSpeed = 2200 // pause at the end
-        } else {
-          typingSpeed = 60
-        }
+        charIndex += 1
+        typingSpeed = charIndex === currentPrompt.length ? 2100 : 55
+        if (charIndex === currentPrompt.length) isDeleting = true
       } else {
         setPlaceholderText(currentPrompt.substring(0, charIndex - 1))
-        charIndex--
-
+        charIndex -= 1
+        typingSpeed = charIndex === 0 ? 500 : 28
         if (charIndex === 0) {
           isDeleting = false
           setCurrentPromptIndex((prev) => (prev + 1) % prompts.length)
-          typingSpeed = 600 // pause before next prompt
-        } else {
-          typingSpeed = 30
         }
       }
 
@@ -104,17 +96,15 @@ export default function Hero() {
     setShowConfirm(false)
     setShowForm(false)
 
-    const id = typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-      ? crypto.randomUUID()
-      : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
+    const id =
+      typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+        ? crypto.randomUUID()
+        : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
 
     try {
       window.sessionStorage.setItem(
         `velora-trip:${id}`,
-        JSON.stringify({
-          request: pendingForm,
-          createdAt: Date.now(),
-        })
+        JSON.stringify({ request: pendingForm, createdAt: Date.now() })
       )
     } catch (error) {
       console.error("Failed to persist trip request", error)
@@ -124,122 +114,161 @@ export default function Hero() {
   }
 
   return (
-    <section
-      id="hero"
-      className="relative overflow-hidden px-4 pt-36 pb-20 sm:px-6 lg:px-8 lg:pt-44 lg:pb-28"
-      style={{
-        backgroundImage: "url('/images/image.png')",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "cover",
-      }}
-    >
+    <section id="hero" className="relative overflow-hidden pb-24 pt-28 sm:pt-32 lg:pb-32">
+      <div
+        className="absolute inset-0 min-h-[760px] bg-cover bg-center"
+        style={{ backgroundImage: "url('/images/bg.png')" }}
+      />
+      {/* <div className="absolute inset-0 min-h-[760px] bg-[linear-gradient(90deg,rgb(255_255_255_/_96%)_0%,rgb(255_255_255_/_80%)_34%,rgb(255_255_255_/_28%)_66%,rgb(255_255_255_/_5%)_100%)]" /> */}
+      <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-b from-transparent via-[var(--velora-shell)]/80 to-[var(--velora-shell)]" />
 
-
-
-      <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-white/55 to-white/90" />
-
-      <div className="relative z-10 mx-auto max-w-7xl">
+      <div className="velora-container relative z-10 px-4 sm:px-6 lg:px-8">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="mx-auto max-w-4xl text-center"
+          className="max-w-2xl pt-12 lg:pt-16"
         >
-          {/* Badge */}
-          <motion.div variants={itemVariants} className="mb-6 flex justify-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-white/80 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-teal-700 shadow-sm backdrop-blur-sm">
-              <Sparkles className="size-3.5 text-teal-500" />
-              AI Powered Travel Planner
-            </div>
+          <motion.div variants={itemVariants} className="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] text-[var(--velora-primary)] shadow-sm ring-1 ring-[var(--velora-line)] backdrop-blur-xl">
+            <Sparkles className="size-3.5" />
+            AI Powered Travel Planner
           </motion.div>
 
-          {/* Heading */}
           <motion.h1
             variants={itemVariants}
-            className="text-4xl font-bold leading-[1.1] tracking-[-0.04em] text-primary sm:text-6xl md:text-7xl"
+            className="mt-7 text-5xl font-black leading-[0.98] tracking-[-0.02em] text-[var(--velora-ink)] sm:text-6xl lg:text-7xl"
           >
-            Plan unforgettable
-            <br />
-            journeys{" "}
-            <span className="bg-gradient-to-r from-teal-600 via-sky-600 to-rose-500 bg-clip-text text-transparent">
-              with AI
-            </span>
+            Plan unforgettable journeys{" "}
+            <span className="velora-gradient-text">with AI</span>
           </motion.h1>
 
-          {/* Subheading */}
           <motion.p
             variants={itemVariants}
-            className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-gray-600 sm:text-lg sm:leading-8"
+            className="mt-6 max-w-xl text-lg font-medium leading-8 text-[var(--velora-ink-soft)]"
           >
             AI-powered itineraries, budgets, and hidden gems for your next adventure.
           </motion.p>
 
-          {/* Input with typing placeholder */}
           <motion.div
             variants={itemVariants}
-            className="mx-auto mt-10 flex h-16 max-w-2xl items-center overflow-hidden rounded-2xl border border-gray-200 bg-white/90 backdrop-blur-xl shadow-[0_20px_60px_-30px_rgba(15,23,42,0.45)] transition-all duration-300 hover:border-teal-300 focus-within:border-teal-400"
+            className="mt-8 flex max-w-xl flex-col gap-3 rounded-3xl bg-white p-3 shadow-[var(--velora-shadow-strong)] ring-1 ring-[var(--velora-line)] sm:h-16 sm:flex-row sm:items-center sm:rounded-2xl sm:p-2"
           >
-            <Input
-              type="text"
-              placeholder={placeholderText}
-              className="h-full flex-1 border-0 bg-transparent px-5 text-sm text-gray-900 shadow-none outline-none ring-0 placeholder:text-gray-500 focus-visible:ring-0 sm:text-base"
-            />
-
-            <button onClick={() => setShowForm(true)} className="h-full rounded-l-none rounded-r-2xl bg-gray-900 px-6 text-sm font-semibold text-white transition-all duration-300 hover:bg-gray-800 active:scale-[0.98] sm:px-8 border-l border-gray-200 shadow-none cursor-pointer">
-              Generate Trip
+            <div className="flex min-w-0 flex-1 items-center gap-3 px-2 sm:px-3">
+              <MapPin className="size-5 shrink-0 text-[var(--velora-primary)]" />
+              <span className="truncate text-sm font-semibold text-[var(--velora-ink-soft)] sm:text-base">
+                {placeholderText || prompts[0]}
+              </span>
+            </div>
+            <button
+              onClick={() => setShowForm(true)}
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-[var(--velora-primary)] px-6 text-sm font-black text-white shadow-[0_18px_34px_rgb(109_53_255_/_24%)] transition hover:bg-[var(--velora-primary-deep)] active:scale-[0.98]"
+              type="button"
+            >
+              Plan My Trip
+              <ArrowRight className="size-4" />
             </button>
           </motion.div>
 
-          {/* Social Proof */}
-          <motion.div
-            variants={itemVariants}
-            className="mt-8 flex items-center justify-center gap-4"
-          >
+          <motion.div variants={itemVariants} className="mt-8 flex flex-wrap items-center gap-4">
             <div className="flex -space-x-2.5">
-              {travelers.slice(0, 4).map((src, i) => (
-                <Avatar key={i} className="size-9 border-2 border-[#020612] transition-transform hover:scale-110 hover:z-20">
-                  <AvatarImage src={src} alt="Traveler" />
-                  <AvatarFallback className="bg-zinc-800 text-zinc-200">T</AvatarFallback>
+              {travelers.map((src, index) => (
+                <Avatar key={src} className="size-9 border-2 border-white shadow-sm">
+                  <AvatarImage src={src} alt={`Traveler ${index + 1}`} />
+                  <AvatarFallback className="bg-[var(--velora-primary-soft)] text-[var(--velora-primary)]">T</AvatarFallback>
                 </Avatar>
               ))}
             </div>
-
-            <p className="text-sm text-gray-600">
-              <span className="font-semibold text-gray-900">10,000+</span> travelers exploring smarter
+            <p className="text-sm font-semibold text-[var(--velora-ink-soft)]">
+              <span className="font-black text-[var(--velora-ink)]">10,000+</span> travelers exploring smarter
             </p>
           </motion.div>
         </motion.div>
 
-    
+        <motion.div
+          initial={{ opacity: 0, y: 44, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ delay: 0.35, type: "spring", stiffness: 70, damping: 17 }}
+          className="velora-card relative z-20 mx-auto mt-14 grid max-w-5xl gap-6 rounded-[2rem] p-5 sm:p-6 lg:-mb-28 lg:grid-cols-[250px_1fr]"
+        >
+          <div className="flex flex-col justify-between rounded-[1.5rem] bg-white/55 p-2">
+            <div>
+              <h2 className="text-2xl font-black tracking-[-0.04em] text-[var(--velora-ink)]">
+                Goa Getaway <span aria-hidden="true">🌴</span>
+              </h2>
+              <p className="mt-1 text-sm font-bold text-[var(--velora-muted)]">4 Days • 3 Nights</p>
+            </div>
+
+            <div className="mt-8 space-y-5 text-sm">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-[var(--velora-muted)]">Budget</span>
+                <span className="font-black text-[var(--velora-ink)]">₹24,800</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-[var(--velora-muted)]">Travel Dates</span>
+                <span className="font-black text-[var(--velora-ink)]">Nov - Feb</span>
+              </div>
+              <div className="flex items-center justify-end gap-1 font-black text-[var(--velora-ink)]">
+                <Star className="size-4 fill-[#ffb545] text-[#ffb545]" />
+                4.8
+              </div>
+            </div>
+
+            <button className="mt-8 rounded-2xl border border-[var(--velora-line)] bg-white px-5 py-3 text-sm font-black text-[var(--velora-primary)] transition hover:border-[var(--velora-primary)]" type="button">
+              View Itinerary
+            </button>
+          </div>
+
+          <div className="relative min-h-[260px] overflow-hidden rounded-[1.45rem]">
+            <img
+              src="https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1200&q=85"
+              alt="Golden beach itinerary preview"
+              className="h-full min-h-[260px] w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
+            <div className="absolute inset-x-4 bottom-4 grid gap-3 sm:grid-cols-4">
+              {dayCards.map(([day, title]) => (
+                <div key={day} className="rounded-2xl bg-black/58 p-4 text-white backdrop-blur-md">
+                  <p className="text-[11px] font-black uppercase tracking-[0.12em] text-white/80">{day}</p>
+                  <p className="mt-1 text-sm font-black">{title}</p>
+                </div>
+              ))}
+            </div>
+            <div className="absolute right-5 top-5 inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-2 text-xs font-black text-[var(--velora-ink)] shadow-lg backdrop-blur-md">
+              <CalendarDays className="size-4 text-[var(--velora-primary)]" />
+              Smart route
+            </div>
+          </div>
+        </motion.div>
       </div>
-      {/* Form Modal */}
+
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div onClick={() => setShowForm(false)} className="absolute inset-0 bg-black/40" />
-          <div className="relative z-10 w-full max-w-lg p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <button className="absolute inset-0 bg-[var(--velora-ink)]/45" onClick={() => setShowForm(false)} aria-label="Close form" type="button" />
+          <div className="relative z-10 w-full max-w-lg">
             <GenerateForm onConfirmRequest={handleGenerateRequest} />
           </div>
         </div>
       )}
 
-      {/* Confirmation Modal */}
       {showConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div onClick={() => setShowConfirm(false)} className="absolute inset-0 bg-black/40" />
-          <div className="relative bg-white border border-gray-200 rounded-2xl p-5 z-10 w-full max-w-sm">
-            <h3 className="text-lg font-bold text-gray-900">Please confirm</h3>
-            <p className="text-sm text-gray-600 mt-2">Bro — check your choices before we build the itinerary. Proceed?</p>
-            <div className="flex gap-3 mt-4">
-              <Button onClick={() => setShowConfirm(false)} className="flex-1 border border-gray-200 bg-white text-gray-700">Cancel</Button>
-              <Button onClick={confirmGenerate} className="flex-1 bg-gray-900 text-white hover:bg-gray-800">Yes, build itinerary</Button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <button className="absolute inset-0 bg-[var(--velora-ink)]/45" onClick={() => setShowConfirm(false)} aria-label="Close confirmation" type="button" />
+          <div className="velora-card relative z-10 w-full max-w-sm rounded-3xl p-6">
+            <h3 className="text-xl font-black text-[var(--velora-ink)]">Please confirm</h3>
+            <p className="mt-2 text-sm leading-6 text-[var(--velora-muted)]">
+              Check your choices before Velora builds the itinerary. Proceed?
+            </p>
+            <div className="mt-5 flex gap-3">
+              <Button onClick={() => setShowConfirm(false)} className="flex-1 border border-[var(--velora-line)] bg-white text-[var(--velora-ink)] hover:bg-[var(--velora-primary-soft)]">
+                Cancel
+              </Button>
+              <Button onClick={confirmGenerate} className="flex-1 bg-[var(--velora-primary)] text-white hover:bg-[var(--velora-primary-deep)]">
+                Build trip
+              </Button>
             </div>
           </div>
         </div>
       )}
-
-      {/* AI Processing Overlay */}
-      {/* Processing moved to trip page; hero no longer shows loading */}
     </section>
   )
 }

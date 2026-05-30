@@ -9,7 +9,7 @@ import Footer from "@/components/landing/footer";
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen overflow-hidden bg-background text-foreground transition-colors duration-300">
+    <main className="min-h-screen overflow-hidden bg-[var(--velora-shell)] text-[var(--velora-ink)]">
       <Navbar />
       <Hero />
       <HowItWorks />

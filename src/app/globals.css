@@ -49,82 +49,134 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --velora-ink: #070b26;
+  --velora-ink-soft: #29304f;
+  --velora-muted: #68708f;
+  --velora-primary: #6d35ff;
+  --velora-primary-deep: #4516d6;
+  --velora-primary-soft: #efe9ff;
+  --velora-pink: #ff4fb8;
+  --velora-sky: #8fc8ff;
+  --velora-sun: #ffd8a8;
+  --velora-shell: #fbfaff;
+  --velora-surface: #ffffff;
+  --velora-surface-soft: #f5f1ff;
+  --velora-line: #ded7ff;
+  --velora-footer: #030b28;
+  --velora-shadow: 0 26px 80px rgb(48 28 112 / 14%);
+  --velora-shadow-strong: 0 32px 90px rgb(37 18 96 / 22%);
+
+  --background: var(--velora-shell);
+  --foreground: var(--velora-ink);
+  --card: var(--velora-surface);
+  --card-foreground: var(--velora-ink);
+  --popover: var(--velora-surface);
+  --popover-foreground: var(--velora-ink);
+  --primary: var(--velora-primary);
+  --primary-foreground: #ffffff;
+  --secondary: var(--velora-primary-soft);
+  --secondary-foreground: var(--velora-ink);
+  --muted: #f2effc;
+  --muted-foreground: var(--velora-muted);
+  --accent: var(--velora-primary-soft);
+  --accent-foreground: var(--velora-primary-deep);
+  --destructive: #e5484d;
+  --border: var(--velora-line);
+  --input: #e8e2ff;
+  --ring: var(--velora-primary);
+  --chart-1: var(--velora-primary);
+  --chart-2: var(--velora-pink);
+  --chart-3: var(--velora-sky);
+  --chart-4: var(--velora-sun);
+  --chart-5: var(--velora-primary-deep);
+  --radius: 1rem;
+  --sidebar: var(--velora-surface);
+  --sidebar-foreground: var(--velora-ink);
+  --sidebar-primary: var(--velora-primary);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--velora-primary-soft);
+  --sidebar-accent-foreground: var(--velora-primary-deep);
+  --sidebar-border: var(--velora-line);
+  --sidebar-ring: var(--velora-primary);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: var(--velora-footer);
+  --foreground: #f9f7ff;
+  --card: #0b1236;
+  --card-foreground: #f9f7ff;
+  --popover: #0b1236;
+  --popover-foreground: #f9f7ff;
+  --primary: #8b5cff;
+  --primary-foreground: #ffffff;
+  --secondary: #151c45;
+  --secondary-foreground: #f9f7ff;
+  --muted: #151c45;
+  --muted-foreground: #aeb6d9;
+  --accent: #20155a;
+  --accent-foreground: #f9f7ff;
+  --destructive: #ff6b6b;
+  --border: rgb(255 255 255 / 12%);
+  --input: rgb(255 255 255 / 16%);
+  --ring: #a489ff;
+  --sidebar: #0b1236;
+  --sidebar-foreground: #f9f7ff;
+  --sidebar-primary: #8b5cff;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #151c45;
+  --sidebar-accent-foreground: #f9f7ff;
+  --sidebar-border: rgb(255 255 255 / 12%);
+  --sidebar-ring: #a489ff;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
+  html {
+    @apply scroll-smooth font-sans;
+  }
+
   body {
     @apply bg-background text-foreground;
+    background:
+      radial-gradient(circle at top left, rgb(255 216 168 / 38%), transparent 26rem),
+      radial-gradient(circle at 85% 8%, rgb(143 200 255 / 30%), transparent 28rem),
+      linear-gradient(180deg, var(--velora-shell) 0%, #f8f6ff 46%, #ffffff 100%);
   }
-  html {
-    @apply font-sans;
+
+  ::selection {
+    background: var(--velora-primary);
+    color: #ffffff;
+  }
+}
+
+@layer components {
+  .velora-section {
+    @apply relative overflow-hidden px-4 py-20 sm:px-6 lg:px-8 lg:py-24;
+  }
+
+  .velora-container {
+    @apply mx-auto max-w-7xl;
+  }
+
+  .velora-eyebrow {
+    @apply text-[11px] font-black uppercase tracking-[0.18em];
+    color: var(--velora-primary);
+  }
+
+  .velora-card {
+    background: rgb(255 255 255 / 84%);
+    border: 1px solid rgb(222 215 255 / 78%);
+    box-shadow: var(--velora-shadow);
+    backdrop-filter: blur(24px);
+  }
+
+  .velora-gradient-text {
+    background: linear-gradient(100deg, var(--velora-primary) 0%, #854dff 45%, var(--velora-pink) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 }

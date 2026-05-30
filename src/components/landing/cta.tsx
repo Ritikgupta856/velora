@@ -1,13 +1,54 @@
 "use client"
+
 import React from "react"
+import { ArrowRight } from "lucide-react"
+import { motion } from "framer-motion"
 
 export default function CTA() {
   return (
-    <section className="py-12 bg-indigo-600 text-white">
-      <div className="max-w-4xl mx-auto px-4 text-center">
-        <h3 className="text-2xl font-bold mb-2">Ready to go?</h3>
-        <p className="mb-4">Find your next adventure with Velora.</p>
-        <button className="bg-white text-indigo-600 px-4 py-2 rounded">Explore trips</button>
+    <section className="relative overflow-hidden bg-[#020612] py-24 text-white">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98, y: 30 }}
+          whileInView={{ opacity: 1, scale: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ type: "spring", stiffness: 70, damping: 15 }}
+          className="mx-auto overflow-hidden rounded-2xl border border-violet-300/35 bg-[#16072e] shadow-[0_24px_90px_rgba(124,58,237,0.18)]"
+        >
+          <div
+            className="relative min-h-48 px-8 py-10 sm:px-12 sm:py-14"
+            style={{
+              backgroundImage: "url('/images/cta-bg.png')",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            }}
+          >
+            {/* Ambient overlay */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_20%,rgba(236,72,153,0.35),transparent_30%)] pointer-events-none" />
+
+            <div className="relative z-10 flex flex-col gap-8 md:flex-row md:items-center">
+              <div>
+                <h2 className="max-w-md text-3xl font-black leading-tight tracking-tight sm:text-4xl">
+                  Ready to plan your next adventure?
+                </h2>
+
+                <p className="mt-4 max-w-sm text-base leading-relaxed text-white/80">
+                  Tell us where you want to go, and let AI handle the rest.
+                </p>
+
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="inline-flex w-fit items-center gap-3 mt-6 rounded-lg bg-white px-7 py-3 text-sm font-black text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur transition hover:bg-zinc-100"
+                >
+                  Generate My Trip
+                  <ArrowRight className="size-4" />
+                </motion.button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   )

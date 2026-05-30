@@ -1,0 +1,127 @@
+"use client"
+
+import React from "react"
+import { MessageSquare, Sparkles, Sliders, Briefcase } from "lucide-react"
+import { motion } from "framer-motion"
+
+const steps = [
+  {
+    number: "1",
+    title: "Tell us your plan",
+    description: "Share your destination, dates, budget, and preferences.",
+    icon: MessageSquare,
+  },
+  {
+    number: "2",
+    title: "AI builds your trip",
+    description: "Our AI crafts the perfect itinerary, budget, and routes.",
+    icon: Sparkles,
+  },
+  {
+    number: "3",
+    title: "Review & customize",
+    description: "Tweak your plan, adjust stops, and make it yours.",
+    icon: Sliders,
+  },
+  {
+    number: "4",
+    title: "Pack & go",
+    description: "Save, share, and sync your trip. Adventure awaits!",
+    icon: Briefcase,
+  },
+]
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 25 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 80,
+      damping: 14,
+    },
+  },
+}
+
+export default function HowItWorks() {
+  return (
+    <section id="how" className="relative py-24 bg-[#020612] overflow-hidden text-white">
+      {/* Background Subtle Glows */}
+      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[350px] h-[350px] bg-violet-600/5 rounded-full blur-[80px] pointer-events-none" />
+      <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[350px] h-[350px] bg-fuchsia-600/3 rounded-full blur-[80px] pointer-events-none" />
+
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <motion.span
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-400"
+          >
+            How it works
+          </motion.span>
+          <motion.h2
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl"
+          >
+            Plan your trip in 4 simple steps
+          </motion.h2>
+        </div>
+
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          className="grid gap-6 md:grid-cols-2 lg:grid-cols-4"
+        >
+          {steps.map((step) => {
+            const Icon = step.icon
+            return (
+              <motion.div
+                key={step.number}
+                variants={itemVariants}
+                whileHover={{ y: -6, transition: { duration: 0.2 } }}
+                className="group relative rounded-3xl border border-white/5 bg-white/[0.02] p-8 backdrop-blur-xl transition-all duration-300 hover:border-violet-500/30 hover:bg-white/[0.04] shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
+              >
+                {/* Step indicator */}
+                <div className="absolute top-6 left-6 text-xs font-bold text-violet-400/40 tracking-wider">
+                  STEP {step.number.padStart(2, '0')}
+                </div>
+
+                <div className="mt-4 flex justify-center">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-600/10 text-violet-400 group-hover:bg-violet-600/20 group-hover:scale-105 transition-all duration-300 shadow-[0_8px_30px_rgba(124,58,237,0.1)] group-hover:shadow-[0_8px_30px_rgba(124,58,237,0.2)]">
+                    <Icon className="size-6 text-violet-400 transition-transform duration-300" />
+                  </div>
+                </div>
+
+                <div className="mt-6 text-center">
+                  <h3 className="text-lg font-semibold text-white group-hover:text-white transition-colors">
+                    {step.title}
+                  </h3>
+                  <p className="mt-3 text-sm text-zinc-400 leading-relaxed transition-colors duration-300 group-hover:text-zinc-300">
+                    {step.description}
+                  </p>
+                </div>
+              </motion.div>
+            )
+          })}
+        </motion.div>
+      </div>
+    </section>
+  )
+}

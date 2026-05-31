@@ -10,7 +10,10 @@ import {
   Compass, List, Search, MessageSquare, User, Settings,
   Bell, Plus, Bot, ArrowRight, TrendingUp, DollarSign,
   Heart, Users, ChevronRight, BarChart3,
+ 
 } from "lucide-react"
+
+import type { LucideIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -172,7 +175,7 @@ function getImageForActivity(activity: Partial<Activity>) {
   return "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=120&h=80&fit=crop"
 }
 
-function getBudgetIcon(label = ""): React.ElementType {
+function getBudgetIcon(label = ""): LucideIcon {
   const v = label.toLowerCase()
   if (/stay|hotel|room|accommodation/.test(v)) return Hotel
   if (/food|meal|restaurant/.test(v)) return Utensils
@@ -181,7 +184,7 @@ function getBudgetIcon(label = ""): React.ElementType {
   return ShoppingBag
 }
 
-function highlightIcon(label = ""): React.ElementType {
+function highlightIcon(label = ""): LucideIcon {
   const v = label.toLowerCase()
   if (/beach|water|sea|island/.test(v)) return Waves
   if (/night|music|club|party/.test(v)) return Music
@@ -442,13 +445,36 @@ export default function VeloraTripPage({ tripId }: { tripId?: string }) {
 
   const [daysState, setDaysState] = useState<Day[]>(DAYS_FALLBACK)
   const [budgetState, setBudgetState] = useState<BudgetItem[]>(BUDGET_FALLBACK)
-  const [highlightsState, setHighlightsState] = useState([
-    { label: "Beaches", icon: Waves },
-    { label: "Nightlife", icon: Music },
-    { label: "Cafes", icon: Coffee },
-    { label: "Heritage", icon: Camera },
-    { label: "Sunsets", icon: Sun },
+const [highlightsState, setHighlightsState] =
+  useState<
+    {
+      label: string
+      icon: LucideIcon
+    }[]
+  >([
+    {
+      label: "Beaches",
+      icon: Waves,
+    },
+    {
+      label: "Nightlife",
+      icon: Music,
+    },
+    {
+      label: "Cafes",
+      icon: Coffee,
+    },
+    {
+      label: "Heritage",
+      icon: Camera,
+    },
+    {
+      label: "Sunsets",
+      icon: Sun,
+    },
   ])
+
+
   const [mapPinsState, setMapPinsState] = useState(MAP_PINS_FALLBACK)
   const [titleState, setTitleState] = useState("Goa Escape")
   const [metaState, setMetaState] = useState({

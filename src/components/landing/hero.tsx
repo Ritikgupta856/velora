@@ -110,7 +110,7 @@ export default function Hero() {
       console.error("Failed to persist trip request", error)
     }
 
-    router.push(`/trip/${id}?processing=1`)
+    router.push(`/trips/${id}`)
   }
 
   return (

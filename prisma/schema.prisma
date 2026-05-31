@@ -12,9 +12,193 @@ datasource db {
   provider = "postgresql"
 }
 
+enum TripVisibility {
+  PRIVATE
+  PUBLIC
+}
+
+enum TripStatus {
+  DRAFT
+  COMPLETED
+}
 
 model User {
+  id            String   @id @default(cuid())
+  name          String?
+  username      String?  @unique
+  email         String?  @unique
+  emailVerified Boolean  @default(false)
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Better Auth
+  sessions Session[]
+  accounts Account[]
+
+  // App
+  trips      Trip[]
+  savedTrips SavedTrip[]
+}
+
+model Session {
   id        String   @id @default(cuid())
-  email     String   @unique
+  expiresAt DateTime
+  token     String   @unique
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?   @db.Text // Protects against oversized tokens
+  refreshToken          String?   @db.Text
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+}
+
+model Trip {
+  id            String         @id @default(cuid())
+  userId        String?
+  title         String
+  slug          String         @unique
+  destination   String
+  country       String?
+  coverImage    String?
+  duration      Int
+  budget        String?
+  travelStyle   String?
+  interests     String[]
+  notes         String?
+  status        TripStatus     @default(DRAFT) // Better defaults to DRAFT for new creations
+  visibility    TripVisibility @default(PRIVATE)
+  estimatedCost String?
+  summary       String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  user         User?                      @relation(fields: [userId], references: [id])
+  days         ItineraryDay[]
+  hotels       HotelRecommendation[]
+  restaurants  RestaurantRecommendation[]
+  savedBy      SavedTrip[]
+
+  @@index([userId])
+}
+
+model ItineraryDay {
+  id        String   @id @default(cuid())
+  tripId    String
+  dayNumber Int
+  title     String
+  createdAt DateTime @default(now())
+
+  trip  Trip            @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  items ItineraryItem[]
+
+  @@index([tripId])
+}
+
+model ItineraryItem {
+  id          String   @id @default(cuid())
+  dayId       String
+  title       String
+  placeName   String
+  description String
+  imageUrl    String?
+  latitude    Float?
+  longitude   Float?
+  createdAt   DateTime @default(now())
+
+  day ItineraryDay @relation(fields: [dayId], references: [id], onDelete: Cascade)
+
+  @@index([dayId])
+}
+
+model HotelRecommendation {
+  id          String   @id @default(cuid())
+  tripId      String
+  name        String
+  placeName   String?
+  description String?
+  imageQuery  String?
+  imageUrl    String?
+  priceRange  String?
+  rating      Float?
+  latitude    Float?
+  longitude   Float?
+  createdAt   DateTime @default(now())
+
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@index([tripId])
+}
+
+model RestaurantRecommendation {
+  id          String   @id @default(cuid())
+  tripId      String
+  name        String
+  cuisine     String?
+  placeName   String?
+  description String?
+  imageQuery  String?
+  imageUrl    String?
+  priceRange  String?
+  rating      Float?
+  latitude    Float?
+  longitude   Float?
+  createdAt   DateTime @default(now())
+
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@index([tripId])
+}
+
+model SavedTrip {
+  id        String   @id @default(cuid())
+  userId    String
+  tripId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tripId])
+  @@index([tripId])
+}
+
+model PlaceCache {
+  id               String   @id @default(cuid())
+  query            String   @unique
+  placeId          String?
+  name             String
+  formattedAddress String?
+  imageUrl         String?
+  latitude         Float?
+  longitude        Float?
+  rating           Float?
+  source           String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([query])
 }

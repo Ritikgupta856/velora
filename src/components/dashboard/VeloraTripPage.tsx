@@ -61,7 +61,16 @@ type BudgetItem = {
   icon?: React.ElementType
 }
 
+type MapPinState = {
+  label: string
+  top: string
+  left: string
+}
+
 type TripResponse = {
+  id?: string
+  slug?: string
+  status?: "DRAFT" | "COMPLETED"
   title?: string
   days?: Array<{
     day: number
@@ -495,7 +504,7 @@ const [highlightsState, setHighlightsState] =
   ])
 
 
-  const [mapPinsState, setMapPinsState] = useState([])
+  const [mapPinsState, setMapPinsState] = useState<MapPinState[]>([])
   const [titleState, setTitleState] = useState("")
   const [isLoadingTrip, setIsLoadingTrip] = useState(true)
   const [metaState, setMetaState] = useState({
@@ -605,6 +614,11 @@ const [highlightsState, setHighlightsState] =
 
         // If the trip is draft (or days length is 0), generate the itinerary
         if (payload.trip.status === "DRAFT" || !payload.trip.days || payload.trip.days.length === 0) {
+          if (!payload.trip.id) {
+            setErrorState({ message: "Trip is missing an id. Please create it again." })
+            setIsLoadingTrip(false)
+            return
+          }
           generate(payload.trip.id, payload.request)
         } else {
           applyTrip(payload.trip, payload.request)

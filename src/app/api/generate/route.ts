@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { GoogleGenAI, Type } from "@google/genai"
 import { z } from "zod"
+import { TripStatus } from "@/generated/prisma/enums"
+import { prisma } from "@/lib/prisma"
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || "" })
 const MODEL = "gemini-2.5-flash"
@@ -13,6 +15,113 @@ const InputSchema = z.object({
   style: z.string().optional().default("Balanced"),
   notes: z.string().optional().default(""),
 })
+
+const GeneratedTripSchema = z.object({
+  title: z.string().min(1),
+  days: z.array(z.object({
+    day: z.number().int().positive(),
+    title: z.string().min(1),
+    subtitle: z.string().min(1),
+    activities: z.array(z.object({
+      time: z.string().min(1),
+      title: z.string().min(1),
+      placeName: z.string().min(1),
+      tag: z.string().min(1),
+      tagColor: z.enum(["violet", "teal", "green", "amber"]),
+      desc: z.string().min(1),
+      duration: z.string().min(1),
+      cost: z.string().min(1),
+    })),
+  })).min(1),
+  budget_breakdown: z.array(z.object({
+    label: z.string().min(1),
+    amount: z.string().min(1),
+  })),
+  total_estimated_cost: z.string().min(1),
+})
+
+type ParsedInput = z.infer<typeof InputSchema>
+type GeneratedTrip = z.infer<typeof GeneratedTripSchema>
+
+function slugify(value: string) {
+  const slug = value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+
+  return slug || "trip"
+}
+
+function parseDurationDays(duration: string) {
+  const match = duration.match(/\d+/)
+  return match ? Number(match[0]) : 1
+}
+
+function buildTripSummary(trip: GeneratedTrip) {
+  const budget = trip.budget_breakdown
+    .map((item) => `${item.label}: ${item.amount}`)
+    .join("; ")
+
+  return budget ? `${trip.days.length} days. Budget breakdown: ${budget}` : `${trip.days.length} days.`
+}
+
+async function createUniqueSlug(title: string, destination: string) {
+  const base = slugify(`${title}-${destination}`)
+
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const suffix = attempt === 0 ? "" : `-${attempt + 1}`
+    const slug = `${base}${suffix}`
+    const existing = await prisma.trip.findUnique({ where: { slug }, select: { id: true } })
+    if (!existing) return slug
+  }
+
+  return `${base}-${Date.now().toString(36)}`
+}
+
+async function saveGeneratedTrip(input: ParsedInput, trip: GeneratedTrip) {
+  const slug = await createUniqueSlug(trip.title, input.destination)
+
+  return prisma.trip.create({
+    data: {
+      title: trip.title,
+      slug,
+      destination: input.destination,
+      duration: parseDurationDays(input.duration),
+      budget: input.budget,
+      travelStyle: input.style,
+      interests: input.interests,
+      notes: input.notes,
+      status: TripStatus.COMPLETED,
+      estimatedCost: trip.total_estimated_cost,
+      budgetBreakdown: trip.budget_breakdown,
+      summary: buildTripSummary(trip),
+      days: {
+        create: trip.days.map((day) => ({
+          dayNumber: day.day,
+          title: day.title,
+          items: {
+            create: day.activities.map((activity) => ({
+              title: activity.title,
+              placeName: activity.placeName,
+              description: [
+                activity.desc,
+                `Time: ${activity.time}`,
+                `Duration: ${activity.duration}`,
+                `Cost: ${activity.cost}`,
+                `Tag: ${activity.tag}`,
+              ].join("\n"),
+            })),
+          },
+        })),
+      },
+    },
+    select: {
+      id: true,
+      slug: true,
+    },
+  })
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -217,14 +326,16 @@ TAG RULES:
             message: "Verifying formatting layouts, image queries, and costs.",
           })
 
-          const parsed = JSON.parse(fullText.trim())
-          push(controller, "done", parsed)
+          const parsed = GeneratedTripSchema.parse(JSON.parse(fullText.trim()))
+          const savedTrip = await saveGeneratedTrip(parsedInput, parsed)
+          push(controller, "done", { ...parsed, tripId: savedTrip.id, slug: savedTrip.slug })
           controller.close()
         } catch (error) {
+          console.error("Generate API error:", error)
           push(controller, "error", {
             message: error instanceof Error ? error.message : String(error),
           })
-          controller.error(error)
+          controller.close()
         }
       },
     })
@@ -240,6 +351,42 @@ TAG RULES:
 
   } catch (err: any) {
     console.error("/api/generate error:", err)
-    return NextResponse.json({ error: err?.message || String(err) }, { status: 500 })
+    
+    // Handle Gemini API errors with specific status codes
+    const status = err?.status || 500
+    const message = err?.message || String(err)
+    
+    // If it's a 503 (service unavailable), return that status
+    if (status === 503 || message.includes("503")) {
+      return NextResponse.json(
+        { 
+          error: "The AI service is currently experiencing high demand. Please try again in a few moments.",
+          code: 503,
+          type: "SERVICE_UNAVAILABLE"
+        }, 
+        { status: 503 }
+      )
+    }
+    
+    // For rate limits (429)
+    if (status === 429 || message.includes("429")) {
+      return NextResponse.json(
+        { 
+          error: "Too many requests. Please wait a moment and try again.",
+          code: 429,
+          type: "RATE_LIMITED"
+        }, 
+        { status: 429 }
+      )
+    }
+    
+    return NextResponse.json(
+      { 
+        error: message,
+        code: status,
+        type: "GENERATION_ERROR"
+      }, 
+      { status: status }
+    )
   }
 }

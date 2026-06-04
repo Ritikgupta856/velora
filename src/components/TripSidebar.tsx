@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useState, useEffect } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import {
   Navigation,
@@ -46,8 +46,26 @@ export default function TripSidebar({
 }: {
   onCreateNewTrip?: () => void
 }) {
+  const [isGenerating, setIsGenerating] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
+
+  // Listen for generating state changes
+  useEffect(() => {
+    const checkGenerating = () => {
+      const isGen = window.sessionStorage.getItem("velora-is-generating") === "true"
+      setIsGenerating(isGen)
+    }
+    
+    checkGenerating()
+    
+    // Listen to storage changes
+    const interval = setInterval(checkGenerating, 100)
+    return () => clearInterval(interval)
+  }, [])
+
+  // Don't show sidebar while generating
+  if (isGenerating) return null
 
   return (
     <Sidebar className="border-r border-gray-200 bg-white shrink-0">

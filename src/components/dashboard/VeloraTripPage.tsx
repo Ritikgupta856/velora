@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
+import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   MapPin, Calendar, Wallet, Clock, Star, Navigation,
@@ -90,60 +91,7 @@ type StreamStatus = {
   message?: string
 }
 
-// ─── Static Fallback Data ─────────────────────────────────────────────────────
-
-const DAYS_FALLBACK: Day[] = [
-  {
-    day: 1, title: "North Goa Vibes", subtitle: "Beaches, nightlife and iconic spots", icon: Sun,
-    activities: [
-      { time: "09:00 AM", title: "Baga Beach", tag: "Beach", tagColor: "violet", desc: "Kick off your trip with fun at Baga Beach. Sun, sea and water sports await!", duration: "1.5 hrs", cost: "₹0", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=120&h=80&fit=crop" },
-      { time: "12:00 PM", title: "Lunch at Britto's", tag: "Café", tagColor: "teal", desc: "A famous Goan café with amazing food and cozy vibes.", duration: "1 hr", cost: "₹800 for two", img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=120&h=80&fit=crop" },
-      { time: "04:00 PM", title: "Fontainhas Walk", tag: "Sightseeing", tagColor: "violet", desc: "Explore the charming Latin Quarter with colorful streets and art.", duration: "1.5 hrs", cost: "₹0", img: "https://images.unsplash.com/photo-1614082242765-7c98cbc067db?w=120&h=80&fit=crop" },
-      { time: "08:00 PM", title: "Anjuna Beach & Night Market", tag: "Nightlife", tagColor: "violet", desc: "Enjoy sunset at Anjuna Beach and explore the vibrant night market.", duration: "3 hrs", cost: "₹1,500 for two", img: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=120&h=80&fit=crop" },
-      { time: "10:30 PM", title: "Club Night – Tito's Lane", tag: "Nightlife", tagColor: "violet", desc: "Experience Goa's legendary nightlife with music, drinks and dancing!", duration: "3 hrs", cost: "₹2,500 for two", img: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=120&h=80&fit=crop" },
-    ],
-  },
-  {
-    day: 2, title: "South Goa Serenity", subtitle: "Peaceful beaches and hidden gems", icon: Waves,
-    activities: [
-      { time: "08:00 AM", title: "Palolem Beach Morning", tag: "Beach", tagColor: "teal", desc: "South Goa's most serene beach — crystal water, kayaks.", duration: "2 hrs", cost: "₹400", img: "https://images.unsplash.com/photo-1596895111956-bf1cf0599ce5?w=120&h=80&fit=crop" },
-      { time: "01:00 PM", title: "Seafood Lunch", tag: "Food", tagColor: "teal", desc: "Grilled kingfish, tiger prawns, and coconut rice at a shack.", duration: "1 hr", cost: "₹700", img: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=120&h=80&fit=crop" },
-      { time: "04:00 PM", title: "Butterfly Beach Hike", tag: "Nature", tagColor: "green", desc: "Hidden cove accessible only by boat or jungle trail.", duration: "2 hrs", cost: "₹300", img: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=120&h=80&fit=crop" },
-    ],
-  },
-  {
-    day: 3, title: "Culture & Heritage", subtitle: "Markets, forts, and Portuguese history", icon: Camera,
-    activities: [
-      { time: "09:00 AM", title: "Breakfast at German Bakery", tag: "Food", tagColor: "teal", desc: "Legendary breakfast spot with a hippie vibe.", duration: "1 hr", cost: "₹350", img: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=120&h=80&fit=crop" },
-      { time: "11:00 AM", title: "Anjuna Flea Market", tag: "Shopping", tagColor: "amber", desc: "Shop for silver jewelry, boho clothes, and local handicrafts.", duration: "2 hrs", cost: "₹600", img: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=120&h=80&fit=crop" },
-      { time: "05:30 PM", title: "Chapora Fort Sunset", tag: "Sightseeing", tagColor: "violet", desc: "Iconic hilltop fort with sweeping sunset panoramas.", duration: "1.5 hrs", cost: "Free", img: "https://images.unsplash.com/photo-1549180030-48bf079fb38a?w=120&h=80&fit=crop" },
-    ],
-  },
-  {
-    day: 4, title: "Beach Day & Goodbyes", subtitle: "Spice farm tour and departure", icon: Sunrise,
-    activities: [
-      { time: "09:00 AM", title: "Sahakari Spice Farm Tour", tag: "Culture", tagColor: "amber", desc: "Guided tour of a working spice plantation with elephant ride.", duration: "2 hrs", cost: "₹800", img: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=120&h=80&fit=crop" },
-      { time: "12:00 PM", title: "Check-out & Departure", tag: "Travel", tagColor: "violet", desc: "Head to Goa airport / railway station with wonderful memories.", duration: "—", cost: "—", img: null },
-    ],
-  },
-]
-
-const BUDGET_FALLBACK: BudgetItem[] = [
-  { label: "Stay (3 Nights)", amount: "₹9,000", icon: Hotel },
-  { label: "Food", amount: "₹6,000", icon: Utensils },
-  { label: "Transport", amount: "₹4,000", icon: Navigation },
-  { label: "Activities", amount: "₹3,000", icon: Camera },
-  { label: "Miscellaneous", amount: "₹2,800", icon: ShoppingBag },
-]
-
 const BUDGET_COLORS = ["#6366f1", "#06b6d4", "#f59e0b", "#10b981", "#a78bfa"]
-
-const MAP_PINS_FALLBACK = [
-  { label: "Baga Beach", top: "18%", left: "26%" },
-  { label: "Anjuna Beach", top: "36%", left: "50%" },
-  { label: "Fontainhas", top: "55%", left: "42%" },
-  { label: "Tito's Lane", top: "72%", left: "58%" },
-]
 
 
 // ─── Tag Styles ───────────────────────────────────────────────────────────────
@@ -230,8 +178,8 @@ function parseSafeJson<T>(value: string | null): T | null {
   try { return JSON.parse(value) as T } catch { return null }
 }
 
-function readStoredTrip(tripId: string) {
-  const stored = parseSafeJson<StoredTrip>(window.sessionStorage.getItem(`velora-trip:${tripId}`))
+function readStoredTrip(tripSlug: string) {
+  const stored = parseSafeJson<StoredTrip>(window.sessionStorage.getItem(`velora-trip:${tripSlug}`))
   if (!stored) return null
   return { request: stored.request, trip: stored.trip || stored.result || stored.raw || null }
 }
@@ -369,6 +317,76 @@ function DonutChart({ budget, totalCost }: { budget: BudgetItem[]; totalCost: st
   )
 }
 
+type ErrorState = {
+  message: string
+  code?: number
+  type?: string
+}
+
+function ErrorScreen({ error, onRetry }: { error: ErrorState; onRetry: () => void }) {
+  const getErrorDetails = () => {
+    if (error.code === 503) {
+      return {
+        title: "Service Temporarily Unavailable",
+        description: "The AI service is experiencing high demand. This is temporary.",
+        icon: "⚡",
+      }
+    }
+    if (error.code === 429) {
+      return {
+        title: "Too Many Requests",
+        description: "Please wait a moment and try again.",
+        icon: "⏱️",
+      }
+    }
+    return {
+      title: "Generation Failed",
+      description: error.message || "Something went wrong while generating your itinerary.",
+      icon: "❌",
+    }
+  }
+
+  const details = getErrorDetails()
+
+  return (
+    <div className="min-h-screen bg-white text-gray-900 flex flex-col">
+      <div className="flex items-center px-6 h-16 border-b border-gray-100">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-500 flex items-center justify-center">
+            <Navigation size={14} className="text-white" />
+          </div>
+          <div>
+            <p className="text-sm font-black text-gray-900 leading-none">Velora</p>
+          </div>
+        </div>
+      </div>
+      <main className="flex-1 flex items-center justify-center px-6">
+        <div className="w-full max-w-lg rounded-3xl border border-red-200 bg-red-50 p-7">
+          <div className="text-center">
+            <div className="text-5xl mb-4">{details.icon}</div>
+            <h1 className="text-2xl font-black tracking-tight text-gray-900">{details.title}</h1>
+            <p className="mt-2 text-sm leading-6 text-gray-600">{details.description}</p>
+          </div>
+          <div className="mt-8 flex gap-3">
+            <Button
+              onClick={onRetry}
+              className="flex-1 h-10 bg-violet-600 hover:bg-violet-500 text-white font-semibold"
+            >
+              Try Again
+            </Button>
+            <Button
+              onClick={() => window.history.back()}
+              className="flex-1 h-10 bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold"
+            >
+              Go Back
+            </Button>
+          </div>
+        </div>
+      </main>
+    </div>
+  )
+}
+
 function StreamingScreen({ status }: { status: StreamStatus }) {
   const progress = Math.min(Math.round(status.progress || 0), 100)
   const steps = [
@@ -437,14 +455,14 @@ function StreamingScreen({ status }: { status: StreamStatus }) {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
-export default function VeloraTripPage({ tripId }: { tripId?: string }) {
+export default function VeloraTripPage({ tripSlug }: { tripSlug?: string }) {
   const [activeDay, setActiveDay] = useState(0)
   const [dayLoading, setDayLoading] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [activeFilter, setActiveFilter] = useState("All")
 
-  const [daysState, setDaysState] = useState<Day[]>(DAYS_FALLBACK)
-  const [budgetState, setBudgetState] = useState<BudgetItem[]>(BUDGET_FALLBACK)
+  const [daysState, setDaysState] = useState<Day[]>([])
+  const [budgetState, setBudgetState] = useState<BudgetItem[]>([])
 const [highlightsState, setHighlightsState] =
   useState<
     {
@@ -475,8 +493,9 @@ const [highlightsState, setHighlightsState] =
   ])
 
 
-  const [mapPinsState, setMapPinsState] = useState(MAP_PINS_FALLBACK)
-  const [titleState, setTitleState] = useState("Goa Escape")
+  const [mapPinsState, setMapPinsState] = useState([])
+  const [titleState, setTitleState] = useState("")
+  const [isLoadingTrip, setIsLoadingTrip] = useState(true)
   const [metaState, setMetaState] = useState({
     duration: "4 Days / 3 Nights",
     destination: "Goa, India",
@@ -486,7 +505,9 @@ const [highlightsState, setHighlightsState] =
   const [totalCostState, setTotalCostState] = useState("₹24,800")
   const [isGenerating, setIsGenerating] = useState(false)
   const [statusState, setStatusState] = useState<StreamStatus>({ progress: 0, title: "Preparing itinerary", message: "Starting AI planner" })
+  const [errorState, setErrorState] = useState<ErrorState | null>(null)
   const [hasGeneratedTrip, setHasGeneratedTrip] = useState(false)
+  const [retryTrigger, setRetryTrigger] = useState(0)
 
   const day = daysState[activeDay]
 
@@ -528,12 +549,17 @@ const [highlightsState, setHighlightsState] =
     return () => { mounted = false }
   }, [activeDay])
 
+  // Track generating state in sessionStorage for sidebar visibility
+  useEffect(() => {
+    window.sessionStorage.setItem("velora-is-generating", isGenerating ? "true" : "false")
+  }, [isGenerating])
+
   const applyTrip = (payload: TripResponse, request?: StoredTrip["request"]) => {
     const normalized = normalizeTripResponse(payload)
     if (!normalized) return
     setTitleState(normalized.title)
     setDaysState(normalized.days)
-    setBudgetState(normalized.budget.length ? normalized.budget : BUDGET_FALLBACK)
+    setBudgetState(normalized.budget)
     setTotalCostState(normalized.totalCost || totalCostState)
     setMetaState({
       duration: request?.duration || `${normalized.days.length} Days`,
@@ -551,28 +577,84 @@ const [highlightsState, setHighlightsState] =
         label: a.title,
         top: `${18 + index * 18}%`,
         left: `${26 + (index % 2) * 24}%`,
-      })) || MAP_PINS_FALLBACK
+      })) || []
     )
     setActiveDay(0)
     setHasGeneratedTrip(true)
+    setIsLoadingTrip(false)
   }
 
   useEffect(() => {
-    if (!tripId) return
+    if (!tripSlug) return
     let mounted = true
-    const stored = readStoredTrip(tripId)
+    const stored = readStoredTrip(tripSlug)
     if (stored?.trip) { applyTrip(stored.trip, stored.request); return }
-    if (!stored?.request) return
+
+    const loadStoredTrip = async () => {
+      try {
+        const res = await fetch(`/api/trips/${tripSlug}`)
+        if (!res.ok) {
+          setIsLoadingTrip(false)
+          return false
+        }
+        const payload = await res.json() as StoredTrip
+        if (!mounted || !payload?.trip) {
+          setIsLoadingTrip(false)
+          return false
+        }
+        applyTrip(payload.trip, payload.request)
+        window.sessionStorage.setItem(
+          `velora-trip:${tripSlug}`,
+          JSON.stringify({ ...payload, finishedAt: Date.now() })
+        )
+        return true
+      } catch (error) {
+        console.error("load stored trip error", error)
+        setIsLoadingTrip(false)
+        return false
+      }
+    }
 
     const generate = async () => {
       try {
+        if (!stored?.request) {
+          await loadStoredTrip()
+          return
+        }
+
         setIsGenerating(true)
+        setErrorState(null)
         const res = await fetch("/api/generate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(stored.request),
         })
-        if (!res.ok || !res.body) throw new Error("Could not start itinerary generation")
+        
+        // Handle non-2xx responses
+        if (!res.ok) {
+          try {
+            const errorPayload = await res.json()
+            setErrorState({
+              message: errorPayload.error || "Failed to generate itinerary",
+              code: res.status,
+              type: errorPayload.type,
+            })
+          } catch {
+            setErrorState({
+              message: `Error: ${res.statusText}`,
+              code: res.status,
+            })
+          }
+          setIsGenerating(false)
+          return
+        }
+        
+        if (!res.body) {
+          setErrorState({ message: "Could not start itinerary generation" })
+          setIsGenerating(false)
+          return
+        }
+        
         const reader = res.body.getReader()
         const sse = createSSEReader((event, data) => {
           if (!mounted || !data) return
@@ -585,35 +667,121 @@ const [highlightsState, setHighlightsState] =
             setStatusState((prev) => ({ ...prev, progress: Math.min((prev.progress || 20) + 2, 88) }))
             return
           }
+          if (event === "error") {
+            const payload = parseSafeJson<{ message: string }>(data)
+            setErrorState({
+              message: payload?.message || "Failed to generate itinerary",
+            })
+            setIsGenerating(false)
+            return
+          }
           if (event === "done") {
-            const payload = parseSafeJson<TripResponse>(data)
+            const payload = parseSafeJson<TripResponse & { tripId?: string }>(data)
             if (!payload) return
             setStatusState({ progress: 100, title: "Itinerary ready", message: "Opening your trip." })
             applyTrip(payload, stored.request)
-            window.sessionStorage.setItem(
-              `velora-trip:${tripId}`,
-              JSON.stringify({ ...stored, trip: payload, finishedAt: Date.now() })
-            )
+            if (payload.slug) {
+              window.sessionStorage.setItem(
+                `velora-trip:${payload.slug}`,
+                JSON.stringify({ ...stored, trip: payload, finishedAt: Date.now() })
+              )
+              window.history.replaceState(null, "", `/trips/${payload.slug}`)
+            }
             setIsGenerating(false)
           }
         })
-        while (true) {
-          const { done, value } = await reader.read()
-          if (done) break
-          if (value) sse.append(value)
+        try {
+          while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+            if (value) sse.append(value)
+          }
+          sse.flush()
+        } catch (streamError) {
+          console.error("stream read error", streamError)
+          if (mounted) {
+            setErrorState({
+              message: "Connection interrupted. Please try again.",
+            })
+            setIsGenerating(false)
+          }
         }
-        sse.flush()
       } catch (error) {
         console.error("generate itinerary error", error)
+        setErrorState({
+          message: error instanceof Error ? error.message : "An unexpected error occurred",
+        })
         setIsGenerating(false)
       }
     }
     void generate()
     return () => { mounted = false }
-  }, [tripId])
+  }, [tripSlug, retryTrigger])
 
-  if (isGenerating && !hasGeneratedTrip) {
+  if (isGenerating && !hasGeneratedTrip && !errorState) {
     return <StreamingScreen status={statusState} />
+  }
+
+  if (errorState) {
+    return (
+      <ErrorScreen
+        error={errorState}
+        onRetry={() => {
+          setErrorState(null)
+          setStatusState({ progress: 0, title: "Preparing itinerary", message: "Starting AI planner" })
+          setRetryTrigger(prev => prev + 1)
+        }}
+      />
+    )
+  }
+
+  if (isLoadingTrip && !hasGeneratedTrip) {
+    return (
+      <div className="min-h-screen bg-white text-gray-900 flex flex-col">
+        <div className="flex items-center px-6 h-16 border-b border-gray-100">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-500 flex items-center justify-center">
+              <Navigation size={14} className="text-white" />
+            </div>
+            <p className="text-sm font-black text-gray-900 leading-none">Velora</p>
+          </div>
+        </div>
+        <main className="flex-1 flex items-center justify-center px-6">
+          <div className="w-full max-w-lg rounded-3xl border border-gray-200 bg-white p-7 shadow-[0_24px_80px_rgba(15,23,42,0.08)]">
+            <div className="space-y-4">
+              <div className="h-4 bg-gray-200 rounded-full animate-pulse" />
+              <div className="h-10 bg-gray-200 rounded-lg animate-pulse" />
+              <div className="space-y-2 mt-6">
+                <div className="h-4 bg-gray-100 rounded-full animate-pulse" />
+                <div className="h-4 bg-gray-100 rounded-full animate-pulse w-5/6" />
+                <div className="h-4 bg-gray-100 rounded-full animate-pulse w-4/6" />
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    )
+  }
+
+  if (!hasGeneratedTrip || !titleState) {
+    return (
+      <div className="min-h-screen bg-white text-gray-900 flex flex-col items-center justify-center px-6">
+        <div className="text-center max-w-md">
+          <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+            <MapPin className="w-8 h-8 text-gray-400" />
+          </div>
+          <h2 className="text-2xl font-black text-gray-900 mb-2">No Trip Found</h2>
+          <p className="text-gray-600 mb-6">
+            This trip doesn't exist or couldn't be loaded. Start by generating a new trip.
+          </p>
+          <Link href="/">
+            <Button className="bg-violet-600 hover:bg-violet-500 text-white">
+              Generate a Trip
+            </Button>
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   const dayIcons = [Sun, Waves, Camera, Sunrise]

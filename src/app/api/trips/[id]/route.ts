@@ -21,15 +21,15 @@ function parseDescription(value: string) {
 
 export async function GET(
   _req: Request,
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { slug } = await params
+    const { id } = await params
     const trip = await prisma.trip.findFirst({
       where: {
         OR: [
-          { id: slug },
-          { slug: slug },
+          { id: id },
+          { slug: id },
         ],
       },
       include: {
@@ -56,6 +56,8 @@ export async function GET(
         style: trip.travelStyle || undefined,
       },
       trip: {
+        id: trip.id,
+        status: trip.status,
         title: trip.title,
         days: trip.days.map((day) => ({
           day: day.dayNumber,
@@ -76,7 +78,7 @@ export async function GET(
             }
           }),
         })),
-        budget_breakdown: [],
+        budget_breakdown: (trip.budgetBreakdown as any) || [],
         total_estimated_cost: trip.estimatedCost || "",
       },
     })

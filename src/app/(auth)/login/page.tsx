@@ -1,15 +1,48 @@
-
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { signIn } from "@/lib/auth-client";
 
 export default function SignInPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleEmailSignIn = async () => {
+    try {
+      setLoading(true);
+
+      const result = await signIn.email({
+        email,
+        password,
+      });
+
+      console.log(result);
+
+      window.location.href = "/trips";
+    } catch (error) {
+      console.error(error);
+      alert("Invalid credentials");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    await signIn.social({
+      provider: "google",
+      callbackURL: "/trips",
+    });
+  };
+
   return (
     <div className="space-y-8">
       <div className="space-y-3">
-        <h2 className="text-4xl font-bold tracking-tight text-slate-900">
+        <h2 className="text-4xl font-bold tracking-tight">
           Welcome back
         </h2>
 
@@ -19,61 +52,69 @@ export default function SignInPage() {
       </div>
 
       <div className="space-y-5">
+        <Button
+          variant="outline"
+          className="h-12 w-full rounded-2xl"
+          onClick={handleGoogleSignIn}
+        >
+          Continue with Google
+        </Button>
+
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-white px-3 text-slate-500">
+              Or continue with email
+            </span>
+          </div>
+        </div>
+
         <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700">
-            Email
-          </label>
+          <label>Email</label>
 
           <Input
             type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
-            className="h-12 rounded-2xl border-slate-200 bg-white"
           />
         </div>
 
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-slate-700">
-              Password
-            </label>
+          <div className="flex justify-between">
+            <label>Password</label>
 
-            <Link
-              href="/forgot-password"
-              className="text-sm text-sky-600 hover:text-sky-700"
-            >
+            <Link href="/forgot-password">
               Forgot password?
             </Link>
           </div>
 
           <Input
             type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
-            className="h-12 rounded-2xl border-slate-200 bg-white"
           />
         </div>
 
-        <Button className="h-12 w-full rounded-2xl bg-sky-600 text-base hover:bg-sky-700">
-          Sign In
-        </Button>
-
         <Button
-          variant="outline"
-          className="h-12 w-full rounded-2xl border-slate-200"
+          onClick={handleEmailSignIn}
+          disabled={loading}
+          className="h-12 w-full rounded-2xl"
         >
-          Continue with Google
+          {loading ? "Signing in..." : "Sign In"}
         </Button>
       </div>
 
-      <p className="text-center text-sm text-slate-500">
-        Don&apos;t have an account?{" "}
-        <Link
-          href="/sign-up"
-          className="font-medium text-sky-600 hover:text-sky-700"
-        >
+      <p className="text-center text-sm">
+        Don't have an account?{" "}
+        <Link href="/sign-up">
           Create account
         </Link>
       </p>
     </div>
   );
 }
-

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useRef } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import {
@@ -453,6 +453,8 @@ function StreamingScreen({ status }: { status: StreamStatus }) {
   )
 }
 
+const activeGenerations = new Set<string>()
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function VeloraTripPage({ tripSlug }: { tripSlug?: string }) {
@@ -587,51 +589,53 @@ const [highlightsState, setHighlightsState] =
   useEffect(() => {
     if (!tripSlug) return
     let mounted = true
-    const stored = readStoredTrip(tripSlug)
-    if (stored?.trip) { applyTrip(stored.trip, stored.request); return }
 
-    const loadStoredTrip = async () => {
+    const loadAndProcessTrip = async () => {
       try {
         const res = await fetch(`/api/trips/${tripSlug}`)
         if (!res.ok) {
           setIsLoadingTrip(false)
-          return false
+          return
         }
         const payload = await res.json() as StoredTrip
         if (!mounted || !payload?.trip) {
           setIsLoadingTrip(false)
-          return false
-        }
-        applyTrip(payload.trip, payload.request)
-        window.sessionStorage.setItem(
-          `velora-trip:${tripSlug}`,
-          JSON.stringify({ ...payload, finishedAt: Date.now() })
-        )
-        return true
-      } catch (error) {
-        console.error("load stored trip error", error)
-        setIsLoadingTrip(false)
-        return false
-      }
-    }
-
-    const generate = async () => {
-      try {
-        if (!stored?.request) {
-          await loadStoredTrip()
           return
         }
 
+        // If the trip is draft (or days length is 0), generate the itinerary
+        if (payload.trip.status === "DRAFT" || !payload.trip.days || payload.trip.days.length === 0) {
+          generate(payload.trip.id, payload.request)
+        } else {
+          applyTrip(payload.trip, payload.request)
+        }
+      } catch (error) {
+        console.error("load stored trip error", error)
+        setIsLoadingTrip(false)
+      }
+    }
+
+    const generate = async (tripId: string, request: StoredTrip["request"]) => {
+      if (activeGenerations.has(tripSlug)) {
+        return
+      }
+
+      try {
+        activeGenerations.add(tripSlug)
         setIsGenerating(true)
         setErrorState(null)
         const res = await fetch("/api/generate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(stored.request),
+          body: JSON.stringify({
+            ...request,
+            tripId,
+          }),
         })
         
         // Handle non-2xx responses
         if (!res.ok) {
+          activeGenerations.delete(tripSlug)
           try {
             const errorPayload = await res.json()
             setErrorState({
@@ -650,6 +654,7 @@ const [highlightsState, setHighlightsState] =
         }
         
         if (!res.body) {
+          activeGenerations.delete(tripSlug)
           setErrorState({ message: "Could not start itinerary generation" })
           setIsGenerating(false)
           return
@@ -668,6 +673,7 @@ const [highlightsState, setHighlightsState] =
             return
           }
           if (event === "error") {
+            activeGenerations.delete(tripSlug)
             const payload = parseSafeJson<{ message: string }>(data)
             setErrorState({
               message: payload?.message || "Failed to generate itinerary",
@@ -676,15 +682,12 @@ const [highlightsState, setHighlightsState] =
             return
           }
           if (event === "done") {
+            activeGenerations.delete(tripSlug)
             const payload = parseSafeJson<TripResponse & { tripId?: string }>(data)
             if (!payload) return
             setStatusState({ progress: 100, title: "Itinerary ready", message: "Opening your trip." })
-            applyTrip(payload, stored.request)
+            applyTrip(payload, request)
             if (payload.slug) {
-              window.sessionStorage.setItem(
-                `velora-trip:${payload.slug}`,
-                JSON.stringify({ ...stored, trip: payload, finishedAt: Date.now() })
-              )
               window.history.replaceState(null, "", `/trips/${payload.slug}`)
             }
             setIsGenerating(false)
@@ -698,6 +701,7 @@ const [highlightsState, setHighlightsState] =
           }
           sse.flush()
         } catch (streamError) {
+          activeGenerations.delete(tripSlug)
           console.error("stream read error", streamError)
           if (mounted) {
             setErrorState({
@@ -707,6 +711,7 @@ const [highlightsState, setHighlightsState] =
           }
         }
       } catch (error) {
+        activeGenerations.delete(tripSlug)
         console.error("generate itinerary error", error)
         setErrorState({
           message: error instanceof Error ? error.message : "An unexpected error occurred",
@@ -714,8 +719,13 @@ const [highlightsState, setHighlightsState] =
         setIsGenerating(false)
       }
     }
-    void generate()
-    return () => { mounted = false }
+
+    void loadAndProcessTrip()
+
+    return () => {
+      mounted = false
+      activeGenerations.delete(tripSlug)
+    }
   }, [tripSlug, retryTrigger])
 
   if (isGenerating && !hasGeneratedTrip && !errorState) {

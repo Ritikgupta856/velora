@@ -39,6 +39,8 @@ model User {
   // App
   trips      Trip[]
   savedTrips SavedTrip[]
+
+  @@map("user")
 }
 
 model Session {
@@ -54,6 +56,7 @@ model Session {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@map("session")
 }
 
 model Account {
@@ -72,36 +75,39 @@ model Account {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  idToken String?
+
   @@unique([providerId, accountId])
   @@index([userId])
+  @@map("account")
 }
 
 model Trip {
-  id               String         @id @default(cuid())
-  userId           String?
-  title            String
-  slug             String         @unique
-  destination      String
-  country          String?
-  coverImage       String?
-  duration         Int
-  budget           String?
-  travelStyle      String?
-  interests        String[]
-  notes            String?
-  status           TripStatus     @default(DRAFT)
-  visibility       TripVisibility @default(PRIVATE)
-  estimatedCost    String?
-  budgetBreakdown  Json?          // Store budget breakdown array
-  summary          String?
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
+  id              String         @id @default(cuid())
+  userId          String?
+  title           String
+  slug            String         @unique
+  destination     String
+  country         String?
+  coverImage      String?
+  duration        Int
+  budget          String?
+  travelStyle     String?
+  interests       String[]
+  notes           String?
+  status          TripStatus     @default(DRAFT)
+  visibility      TripVisibility @default(PRIVATE)
+  estimatedCost   String?
+  budgetBreakdown Json? // Store budget breakdown array
+  summary         String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 
-  user         User?                      @relation(fields: [userId], references: [id])
-  days         ItineraryDay[]
-  hotels       HotelRecommendation[]
-  restaurants  RestaurantRecommendation[]
-  savedBy      SavedTrip[]
+  user        User?                      @relation(fields: [userId], references: [id])
+  days        ItineraryDay[]
+  hotels      HotelRecommendation[]
+  restaurants RestaurantRecommendation[]
+  savedBy     SavedTrip[]
 
   @@index([userId])
 }
@@ -202,4 +208,16 @@ model PlaceCache {
   updatedAt        DateTime @updatedAt
 
   @@index([query])
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
 }

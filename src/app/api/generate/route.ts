@@ -14,6 +14,7 @@ const InputSchema = z.object({
   interests: z.array(z.string()).optional().default([]),
   style: z.string().optional().default("Balanced"),
   notes: z.string().optional().default(""),
+  tripId: z.string().optional(),
 })
 
 const GeneratedTripSchema = z.object({
@@ -80,6 +81,47 @@ async function createUniqueSlug(title: string, destination: string) {
 }
 
 async function saveGeneratedTrip(input: ParsedInput, trip: GeneratedTrip) {
+  if (input.tripId) {
+    // If the trip already exists (as DRAFT), update it!
+    await prisma.itineraryDay.deleteMany({
+      where: { tripId: input.tripId },
+    })
+
+    return prisma.trip.update({
+      where: { id: input.tripId },
+      data: {
+        title: trip.title,
+        estimatedCost: trip.total_estimated_cost,
+        budgetBreakdown: trip.budget_breakdown,
+        summary: buildTripSummary(trip),
+        status: TripStatus.COMPLETED,
+        days: {
+          create: trip.days.map((day) => ({
+            dayNumber: day.day,
+            title: day.title,
+            items: {
+              create: day.activities.map((activity) => ({
+                title: activity.title,
+                placeName: activity.placeName,
+                description: [
+                  activity.desc,
+                  `Time: ${activity.time}`,
+                  `Duration: ${activity.duration}`,
+                  `Cost: ${activity.cost}`,
+                  `Tag: ${activity.tag}`,
+                ].join("\n"),
+              })),
+            },
+          })),
+        },
+      },
+      select: {
+        id: true,
+        slug: true,
+      },
+    })
+  }
+
   const slug = await createUniqueSlug(trip.title, input.destination)
 
   return prisma.trip.create({

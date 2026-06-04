@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react"
 import { usePathname, useRouter } from "next/navigation"
+import Image from "next/image"
 import {
   Navigation,
   Plus,
@@ -13,7 +14,17 @@ import {
   MessageSquare,
   User,
   Settings,
+  LogOut,
+  ChevronsUpDown,
 } from "lucide-react"
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -29,6 +40,7 @@ import {
 } from "@/components/ui/sidebar"
 
 import { cn } from "@/lib/utils"
+import { useSession, signOut } from "@/lib/auth-client"
 
 const NAV_ITEMS = [
   { icon: Compass, label: "Explore", href: "/explore" },
@@ -49,6 +61,7 @@ export default function TripSidebar({
   const [isGenerating, setIsGenerating] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
+  const { data: session } = useSession()
 
   // Listen for generating state changes
   useEffect(() => {
@@ -66,6 +79,15 @@ export default function TripSidebar({
 
   // Don't show sidebar while generating
   if (isGenerating) return null
+
+  const user = session?.user
+  const displayName = user?.name || "Guest"
+  const initials = displayName
+    .split(" ")
+    .map((w: string) => w[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2)
 
   return (
     <Sidebar className="border-r border-gray-200 bg-white shrink-0">
@@ -113,7 +135,8 @@ export default function TripSidebar({
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="px-3 pb-4 space-y-3">
+      <SidebarFooter className="px-3 pb-2.5 space-y-2">
+        {/* Promo card */}
         <div className="rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-500 p-4 text-white relative overflow-hidden">
           <div className="absolute -top-4 -right-4 w-20 h-20 bg-white/10 rounded-full" />
 
@@ -139,7 +162,80 @@ export default function TripSidebar({
             Create New Trip ✦
           </Button>
         </div>
+
+        {/* User Dropdown Menu */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className="w-full text-left rounded-2xl border border-gray-100 bg-gray-50 p-3 hover:bg-gray-100/80 transition-colors focus:outline-hidden"
+              type="button"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                {/* Avatar */}
+                {user?.image ? (
+                  <Image
+                    src={user.image}
+                    alt={displayName}
+                    width={36}
+                    height={36}
+                    className="rounded-full object-cover shrink-0"
+                  />
+                ) : (
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center text-white text-xs font-black shrink-0">
+                    {initials}
+                  </div>
+                )}
+
+                {/* Name & email */}
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold text-gray-900 truncate leading-none mb-0.5">
+                    {displayName}
+                  </p>
+                  {user?.email && (
+                    <p className="text-[11px] text-gray-400 truncate leading-none">
+                      {user.email}
+                    </p>
+                  )}
+                </div>
+
+                <ChevronsUpDown className="shrink-0 size-4 text-gray-400" />
+              </div>
+            </button>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent
+            side="top"
+            align="end"
+            className="w-[240px] p-2 bg-white border border-gray-100 shadow-lg rounded-2xl"
+          >
+            <DropdownMenuItem
+              onClick={() => router.push("/profile")}
+              className="gap-2.5 px-3 py-2.5 text-sm font-medium rounded-xl text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              <User size={16} className="text-gray-400" />
+              <span>Profile</span>
+            </DropdownMenuItem>
+            
+            <DropdownMenuItem
+              onClick={() => router.push("/settings")}
+              className="gap-2.5 px-3 py-2.5 text-sm font-medium rounded-xl text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              <Settings size={16} className="text-gray-400" />
+              <span>Settings</span>
+            </DropdownMenuItem>
+
+            <DropdownMenuSeparator className="my-1 border-gray-100" />
+
+            <DropdownMenuItem
+              onClick={() => signOut({ fetchOptions: { onSuccess: () => router.push("/") } })}
+              className="gap-2.5 px-3 py-2.5 text-sm font-medium rounded-xl text-red-600 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer"
+            >
+              <LogOut size={16} />
+              <span>Log out</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </SidebarFooter>
     </Sidebar>
   )
-}
+}

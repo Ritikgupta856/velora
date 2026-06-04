@@ -91,26 +91,35 @@ export default function Hero() {
     setShowConfirm(true)
   }
 
-  const confirmGenerate = () => {
+  const confirmGenerate = async () => {
     if (!pendingForm) return
     setShowConfirm(false)
     setShowForm(false)
 
-    const id =
-      typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-        ? crypto.randomUUID()
-        : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
-
     try {
-      window.sessionStorage.setItem(
-        `velora-trip:${id}`,
-        JSON.stringify({ request: pendingForm, createdAt: Date.now() })
-      )
-    } catch (error) {
-      console.error("Failed to persist trip request", error)
-    }
+      const res = await fetch("/api/trips", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          destination: pendingForm.destination,
+          duration: pendingForm.duration,
+          budget: pendingForm.budget,
+          style: pendingForm.style,
+          interests: pendingForm.interests,
+          notes: pendingForm.notes,
+        }),
+      })
 
-    router.push(`/trips/${id}`)
+      if (!res.ok) {
+        throw new Error("Failed to create draft trip")
+      }
+
+      const data = await res.json()
+      router.push(`/trips/${data.slug || data.id}`)
+    } catch (error) {
+      console.error("Failed to create draft trip", error)
+      alert("Failed to start trip generation. Please try again.")
+    }
   }
 
   return (

@@ -12,7 +12,6 @@ const navItems = [
   { label: "Destinations", href: "#destinations" },
   { label: "How it works", href: "#how" },
   { label: "Pricing", href: "#pricing" },
-  { label: "Blog", href: "#" },
 ]
 
 function UserMenu() {
@@ -37,17 +36,17 @@ function UserMenu() {
       <div className="hidden items-center gap-3 md:flex">
         <Link
           href="/login"
-          className="rounded-2xl bg-white/60 px-5 py-3 text-sm font-black text-[var(--velora-primary-deep)] shadow-sm ring-1 ring-white/80 backdrop-blur-xl transition hover:bg-white"
+          className="rounded-lg bg-white/60 px-5 py-3 text-sm font-black text-[var(--velora-primary-deep)] shadow-sm ring-1 ring-white/80 backdrop-blur-xl transition hover:bg-white"
         >
           Log in
         </Link>
         <Link
           href="/sign-up"
-          className="rounded-2xl bg-[var(--velora-primary)] px-6 py-3 text-sm font-black text-white shadow-[0_16px_36px_rgb(109_53_255_/_28%)] transition hover:bg-[var(--velora-primary-deep)]"
+          className="rounded-lg bg-[var(--velora-primary)] px-6 py-3 text-sm font-black text-white shadow-[0_16px_36px_rgb(109_53_255_/_28%)] transition hover:bg-[var(--velora-primary-deep)]"
         >
           Sign up
         </Link>
-      </div>
+      </div >
     )
   }
 
@@ -175,11 +174,10 @@ export default function Navbar() {
 
   return (
     <header
-      className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "border-b border-[var(--velora-line)]/80 bg-[var(--velora-shell)]/88 py-3 shadow-[0_14px_50px_rgb(48_28_112_/_8%)] backdrop-blur-2xl"
-          : "bg-transparent py-5"
-      }`}
+      className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${isScrolled
+        ? "border-b border-[var(--velora-line)]/80 bg-[var(--velora-shell)]/88 py-3 shadow-[0_14px_50px_rgb(48_28_112_/_8%)] backdrop-blur-2xl"
+        : "bg-transparent py-5"
+        }`}
     >
       <div className="velora-container flex items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-3">

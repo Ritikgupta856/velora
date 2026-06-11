@@ -3,7 +3,8 @@ import { GoogleGenAI, Type } from "@google/genai"
 import { z } from "zod"
 
 import { prisma } from "@/lib/prisma"
-import { TripStatus } from "../../../generated/prisma/enums"
+import { TripStatus } from "@/generated/prisma/enums"
+
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || "" })
 const MODEL = "gemini-2.5-flash"
